@@ -11,6 +11,7 @@
 </tr>
 <tr>
 <td valign="top">
+<a href="#14.16.1">14.16.1</a><br/>
 <a href="#14.16.0">14.16.0</a><br/>
 <a href="#14.15.5">14.15.5</a><br/>
 <a href="#14.15.4">14.15.4</a><br/>
@@ -56,6 +57,23 @@
   * [0.10.x](CHANGELOG_V010.md)
   * [io.js](CHANGELOG_IOJS.md)
   * [Archive](CHANGELOG_ARCHIVE.md)
+
+<a id="14.16.1"></a>
+## 2021-04-06, Version 14.16.1 'Fermium' (LTS), @mylesborins
+
+This is a security release.
+
+### Notable Changes
+
+Vulnerabilities fixed:
+
+COMING SOON
+
+### Commits
+
+* [[`467be7a950`](https://github.com/nodejs/node/commit/467be7a950)] - **deps**: upgrade npm to 6.14.12 (Ruy Adorno) [#37918](https://github.com/nodejs/node/pull/37918)
+* [[`6bc8f58182`](https://github.com/nodejs/node/commit/6bc8f58182)] - **deps**: update archs files for OpenSSL-1.1.1k (Tobias Nießen) [#37938](https://github.com/nodejs/node/pull/37938)
+* [[`403a014ef6`](https://github.com/nodejs/node/commit/403a014ef6)] - **deps**: upgrade openssl sources to 1.1.1k (Tobias Nießen) [#37938](https://github.com/nodejs/node/pull/37938)
 
 <a id="14.16.0"></a>
 ## 2021-02-23, Version 14.16.0 'Fermium' (LTS), @BethGriggs
