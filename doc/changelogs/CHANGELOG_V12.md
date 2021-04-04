@@ -11,6 +11,7 @@
 </tr>
 <tr>
 <td valign="top">
+<a href="#12.22.1">12.22.1</a><br/>
 <a href="#12.22.0">12.22.0</a><br/>
 <a href="#12.21.0">12.21.0</a><br/>
 <a href="#12.20.2">12.20.2</a><br/>
@@ -69,6 +70,23 @@
   * [0.10.x](CHANGELOG_V010.md)
   * [io.js](CHANGELOG_IOJS.md)
   * [Archive](CHANGELOG_ARCHIVE.md)
+
+<a id="12.22.1"></a>
+## 2021-04-06, Version 12.22.1 'Erbium' (LTS), @mylesborins
+
+This is a security release.
+
+### Notable Changes
+
+Vulnerabilities fixed:
+
+COMING SOON
+
+### Commits
+
+* [[`c947f1a0e1`](https://github.com/nodejs/node/commit/c947f1a0e1)] - **deps**: upgrade npm to 6.14.12 (Ruy Adorno) [#37918](https://github.com/nodejs/node/pull/37918)
+* [[`51a753c06f`](https://github.com/nodejs/node/commit/51a753c06f)] - **deps**: update archs files for OpenSSL-1.1.1k (Tobias Nießen) [#37939](https://github.com/nodejs/node/pull/37939)
+* [[`c85a519b48`](https://github.com/nodejs/node/commit/c85a519b48)] - **deps**: upgrade openssl sources to 1.1.1k (Tobias Nießen) [#37939](https://github.com/nodejs/node/pull/37939)
 
 <a id="12.22.0"></a>
 ## 2021-03-30, Version 12.22.0 'Erbium' (LTS), @richardlau
