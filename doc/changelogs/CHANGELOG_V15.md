@@ -10,6 +10,7 @@
 </tr>
 <tr>
 <td>
+<a href="#15.14.0">15.14.0</a><br/>
 <a href="#15.13.0">15.13.0</a><br/>
 <a href="#15.12.0">15.12.0</a><br/>
 <a href="#15.11.0">15.11.0</a><br/>
@@ -47,6 +48,70 @@
   * [0.10.x](CHANGELOG_V010.md)
   * [io.js](CHANGELOG_IOJS.md)
   * [Archive](CHANGELOG_ARCHIVE.md)
+
+<a id="15.14.0"></a>
+## 2021-04-06, Version 15.14.0 (Current), @mylesborins
+
+This is a security release.
+
+### Notable Changes
+
+#### Vulnerabilties fixed
+
+Coming Soon
+
+#### Other Notable Changes
+
+* [[`ff4e823ef1`](https://github.com/nodejs/node/commit/ff4e823ef1)] - **(SEMVER-MINOR)** **fs**: add support for async iterators to `fsPromises.writeFile` (HiroyukiYagihashi) [#37490](https://github.com/nodejs/node/pull/37490)
+* [[`0709cbb7fe`](https://github.com/nodejs/node/commit/0709cbb7fe)] - **(SEMVER-MINOR)** **net**: allow net.BlockList to use net.SocketAddress objects (James M Snell) [#37917](https://github.com/nodejs/node/pull/37917)
+* [[`daa8a7bbcf`](https://github.com/nodejs/node/commit/daa8a7bbcf)] - **(SEMVER-MINOR)** **net**: add SocketAddress class (James M Snell) [#37917](https://github.com/nodejs/node/pull/37917)
+* [[`a4169ce519`](https://github.com/nodejs/node/commit/a4169ce519)] - **(SEMVER-MINOR)** **net**: make net.BlockList cloneable (James M Snell) [#37917](https://github.com/nodejs/node/pull/37917)
+* [[`669b81c68b`](https://github.com/nodejs/node/commit/669b81c68b)] - **(SEMVER-MINOR)** **net,tls**: add abort signal support to connect (Nitzan Uziely) [#37735](https://github.com/nodejs/node/pull/37735)
+* [[`a1123f0a29`](https://github.com/nodejs/node/commit/a1123f0a29)] - **(SEMVER-MINOR)** **readline**: add AbortSignal support to interface (Nitzan Uziely) [#37932](https://github.com/nodejs/node/pull/37932)
+
+### Commits
+
+* [[`5e54aa733f`](https://github.com/nodejs/node/commit/5e54aa733f)] - **crypto**: use correct webcrypto RSASSA-PKCS1-v1\_5 algorithm name (Filip Skokan) [#38029](https://github.com/nodejs/node/pull/38029)
+* [[`8b12db61cf`](https://github.com/nodejs/node/commit/8b12db61cf)] - **crypto**: add buffering to randomInt (Tobias Nießen) [#35110](https://github.com/nodejs/node/pull/35110)
+* [[`4ef102d34e`](https://github.com/nodejs/node/commit/4ef102d34e)] - **deps**: update to cjs-module-lexer@1.1.1 (Guy Bedford) [#37992](https://github.com/nodejs/node/pull/37992)
+* [[`f0e77149a4`](https://github.com/nodejs/node/commit/f0e77149a4)] - **deps**: update archs files for OpenSSL-1.1.1k (Hassaan Pasha) [#37916](https://github.com/nodejs/node/pull/37916)
+* [[`bbdcdad2c6`](https://github.com/nodejs/node/commit/bbdcdad2c6)] - **deps**: upgrade openssl sources to 1.1.1k+quic (Hassaan Pasha) [#37916](https://github.com/nodejs/node/pull/37916)
+* [[`913ec56798`](https://github.com/nodejs/node/commit/913ec56798)] - **deps**: cjs-module-lexer: cherry-pick 22093e765f (pezhmanparsaee) [#37895](https://github.com/nodejs/node/pull/37895)
+* [[`d8e2d46abd`](https://github.com/nodejs/node/commit/d8e2d46abd)] - **doc**: fix asyncLocalStorage.run() description (Darkripper214) [#38023](https://github.com/nodejs/node/pull/38023)
+* [[`794876659a`](https://github.com/nodejs/node/commit/794876659a)] - **doc**: document how to unref stdin when using readline.Interface (Anu Pasumarthy) [#38019](https://github.com/nodejs/node/pull/38019)
+* [[`fac2fc1813`](https://github.com/nodejs/node/commit/fac2fc1813)] - **doc**: move psmarshall to collaborators emeriti (Peter Marshall) [#37994](https://github.com/nodejs/node/pull/37994)
+* [[`ae70aa3c63`](https://github.com/nodejs/node/commit/ae70aa3c63)] - **doc**: add distinctive color for code elements inside links (Antoine du Hamel) [#37950](https://github.com/nodejs/node/pull/37950)
+* [[`8792c7c96b`](https://github.com/nodejs/node/commit/8792c7c96b)] - **doc**: add missing events.on metadata (Anna Henningsen) [#37965](https://github.com/nodejs/node/pull/37965)
+* [[`a57dc06adf`](https://github.com/nodejs/node/commit/a57dc06adf)] - **doc**: improve Buffer's encoding documentation (Michaël Zasso) [#37945](https://github.com/nodejs/node/pull/37945)
+* [[`f3fabb57cf`](https://github.com/nodejs/node/commit/f3fabb57cf)] - **doc**: add missing cleanup step in OpenSSL upgrade (Tobias Nießen) [#37927](https://github.com/nodejs/node/pull/37927)
+* [[`13c3924af8`](https://github.com/nodejs/node/commit/13c3924af8)] - **doc**: add Windows-specific info to subprocess.kill() (João Lucas Lucchetta) [#34867](https://github.com/nodejs/node/pull/34867)
+* [[`ff4e823ef1`](https://github.com/nodejs/node/commit/ff4e823ef1)] - **(SEMVER-MINOR)** **fs**: add support for async iterators to `fsPromises.writeFile` (HiroyukiYagihashi) [#37490](https://github.com/nodejs/node/pull/37490)
+* [[`dc460731e8`](https://github.com/nodejs/node/commit/dc460731e8)] - **fs**: fix chown abort (Darshan Sen) [#38004](https://github.com/nodejs/node/pull/38004)
+* [[`d86aca9a77`](https://github.com/nodejs/node/commit/d86aca9a77)] - **http**: optimize debug function correctly (Michaël Zasso) [#37966](https://github.com/nodejs/node/pull/37966)
+* [[`062541aae5`](https://github.com/nodejs/node/commit/062541aae5)] - **http2**: add specific error code for custom frames (Anna Henningsen) [#37936](https://github.com/nodejs/node/pull/37936)
+* [[`8525231902`](https://github.com/nodejs/node/commit/8525231902)] - **lib**: change wording in lib/domain.js comment (Akhil Marsonya) [#37933](https://github.com/nodejs/node/pull/37933)
+* [[`21e399be4c`](https://github.com/nodejs/node/commit/21e399be4c)] - **lib**: change wording in lib/internal/child\_process comment (Akhil Marsonya) [#37903](https://github.com/nodejs/node/pull/37903)
+* [[`618da816d5`](https://github.com/nodejs/node/commit/618da816d5)] - **module**: improve error message for invalid data URL (Antoine du Hamel) [#37701](https://github.com/nodejs/node/pull/37701)
+* [[`0709cbb7fe`](https://github.com/nodejs/node/commit/0709cbb7fe)] - **(SEMVER-MINOR)** **net**: allow net.BlockList to use net.SocketAddress objects (James M Snell) [#37917](https://github.com/nodejs/node/pull/37917)
+* [[`daa8a7bbcf`](https://github.com/nodejs/node/commit/daa8a7bbcf)] - **(SEMVER-MINOR)** **net**: add SocketAddress class (James M Snell) [#37917](https://github.com/nodejs/node/pull/37917)
+* [[`a4169ce519`](https://github.com/nodejs/node/commit/a4169ce519)] - **(SEMVER-MINOR)** **net**: make net.BlockList cloneable (James M Snell) [#37917](https://github.com/nodejs/node/pull/37917)
+* [[`669b81c68b`](https://github.com/nodejs/node/commit/669b81c68b)] - **(SEMVER-MINOR)** **net,tls**: add abort signal support to connect (Nitzan Uziely) [#37735](https://github.com/nodejs/node/pull/37735)
+* [[`de67952919`](https://github.com/nodejs/node/commit/de67952919)] - **path**: fix posix.relative() on Windows (Rich Trott) [#37747](https://github.com/nodejs/node/pull/37747)
+* [[`a94cc27cbe`](https://github.com/nodejs/node/commit/a94cc27cbe)] - **path**: refactor to use more primordials (Akhil Marsonya) [#37893](https://github.com/nodejs/node/pull/37893)
+* [[`6cc1e15669`](https://github.com/nodejs/node/commit/6cc1e15669)] - **readline**: fix pre-aborted signal question handling (Nitzan Uziely) [#37929](https://github.com/nodejs/node/pull/37929)
+* [[`a1123f0a29`](https://github.com/nodejs/node/commit/a1123f0a29)] - **(SEMVER-MINOR)** **readline**: add AbortSignal support to interface (Nitzan Uziely) [#37932](https://github.com/nodejs/node/pull/37932)
+* [[`7a4cb162e6`](https://github.com/nodejs/node/commit/7a4cb162e6)] - **src**: fix typo in node\_mutex (Tobias Nießen) [#38011](https://github.com/nodejs/node/pull/38011)
+* [[`e0948a8b8a`](https://github.com/nodejs/node/commit/e0948a8b8a)] - **src**: fix typos in crypto comments (Tobias Nießen) [#38024](https://github.com/nodejs/node/pull/38024)
+* [[`2864ee90ff`](https://github.com/nodejs/node/commit/2864ee90ff)] - **src**: fix error handling for CryptoJob::ToResult (Tobias Nießen) [#37076](https://github.com/nodejs/node/pull/37076)
+* [[`2a3686759b`](https://github.com/nodejs/node/commit/2a3686759b)] - **test**: add extra space in test failure output (Qingyu Deng) [#37957](https://github.com/nodejs/node/pull/37957)
+* [[`6bf507f99f`](https://github.com/nodejs/node/commit/6bf507f99f)] - **test**: use faster variant for rss (Pooja D P) [#36839](https://github.com/nodejs/node/pull/36839)
+* [[`4b1345e299`](https://github.com/nodejs/node/commit/4b1345e299)] - **test**: fix test-tls-no-sslv3 for OpenSSL 3 (Richard Lau) [#38027](https://github.com/nodejs/node/pull/38027)
+* [[`0d54889624`](https://github.com/nodejs/node/commit/0d54889624)] - **test**: deflake test-fs-read-optional-params (Luigi Pinca) [#37991](https://github.com/nodejs/node/pull/37991)
+* [[`4d50975cd7`](https://github.com/nodejs/node/commit/4d50975cd7)] - **test**: improve clarity of ALS-enable-disable.js (Darkripper214) [#38008](https://github.com/nodejs/node/pull/38008)
+* [[`5e15ae05d0`](https://github.com/nodejs/node/commit/5e15ae05d0)] - **test**: add DataView test case for v8 serdes (Rich Trott) [#37955](https://github.com/nodejs/node/pull/37955)
+* [[`2bfd77b479`](https://github.com/nodejs/node/commit/2bfd77b479)] - **tools**: update ESLint to 7.23.0 (Luigi Pinca) [#37979](https://github.com/nodejs/node/pull/37979)
+* [[`51e7a33d54`](https://github.com/nodejs/node/commit/51e7a33d54)] - **tools,doc**: add "legacy" badge in the TOC (Antoine du Hamel) [#37949](https://github.com/nodejs/node/pull/37949)
+* [[`570fbcef93`](https://github.com/nodejs/node/commit/570fbcef93)] - **url**: forbid pipe in URL host (Darshan Sen) [#37877](https://github.com/nodejs/node/pull/37877)
 
 <a id="15.13.0"></a>
 ## 2021-03-31, Version 15.13.0 (Current), @ruyadorno
