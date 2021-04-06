@@ -6,7 +6,7 @@
       src="https://nodejs.org/static/images/logo-light.svg"
       width="400"
     />
-  </a>
+  </a> 
 </p>
 
 Node.js is an open-source, cross-platform, JavaScript runtime environment. It
