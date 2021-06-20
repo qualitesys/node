@@ -174,34 +174,34 @@ t.test('npm.load', t => {
       t.equal(npm.log, npmlog, 'npmlog getter')
       t.equal(npm.lockfileVersion, 2, 'lockfileVersion getter')
       t.equal(npm.prefix, npm.localPrefix, 'prefix is local prefix')
-      t.notEqual(npm.prefix, npm.globalPrefix, 'prefix is not global prefix')
+      t.not(npm.prefix, npm.globalPrefix, 'prefix is not global prefix')
       npm.globalPrefix = npm.prefix
       t.equal(npm.prefix, npm.globalPrefix, 'globalPrefix setter')
       npm.localPrefix = dir + '/extra/prefix'
       t.equal(npm.prefix, npm.localPrefix, 'prefix is local prefix after localPrefix setter')
-      t.notEqual(npm.prefix, npm.globalPrefix, 'prefix is not global prefix after localPrefix setter')
+      t.not(npm.prefix, npm.globalPrefix, 'prefix is not global prefix after localPrefix setter')
 
       npm.prefix = dir + '/some/prefix'
       t.equal(npm.prefix, npm.localPrefix, 'prefix is local prefix after prefix setter')
-      t.notEqual(npm.prefix, npm.globalPrefix, 'prefix is not global prefix after prefix setter')
+      t.not(npm.prefix, npm.globalPrefix, 'prefix is not global prefix after prefix setter')
       t.equal(npm.bin, npm.localBin, 'bin is local bin after prefix setter')
-      t.notEqual(npm.bin, npm.globalBin, 'bin is not global bin after prefix setter')
+      t.not(npm.bin, npm.globalBin, 'bin is not global bin after prefix setter')
       t.equal(npm.dir, npm.localDir, 'dir is local dir after prefix setter')
-      t.notEqual(npm.dir, npm.globalDir, 'dir is not global dir after prefix setter')
+      t.not(npm.dir, npm.globalDir, 'dir is not global dir after prefix setter')
 
       npm.config.set('global', true)
       t.equal(npm.prefix, npm.globalPrefix, 'prefix is global prefix after setting global')
-      t.notEqual(npm.prefix, npm.localPrefix, 'prefix is not local prefix after setting global')
+      t.not(npm.prefix, npm.localPrefix, 'prefix is not local prefix after setting global')
       t.equal(npm.bin, npm.globalBin, 'bin is global bin after setting global')
-      t.notEqual(npm.bin, npm.localBin, 'bin is not local bin after setting global')
+      t.not(npm.bin, npm.localBin, 'bin is not local bin after setting global')
       t.equal(npm.dir, npm.globalDir, 'dir is global dir after setting global')
-      t.notEqual(npm.dir, npm.localDir, 'dir is not local dir after setting global')
+      t.not(npm.dir, npm.localDir, 'dir is not local dir after setting global')
 
       npm.prefix = dir + '/new/global/prefix'
       t.equal(npm.prefix, npm.globalPrefix, 'prefix is global prefix after prefix setter')
-      t.notEqual(npm.prefix, npm.localPrefix, 'prefix is not local prefix after prefix setter')
+      t.not(npm.prefix, npm.localPrefix, 'prefix is not local prefix after prefix setter')
       t.equal(npm.bin, npm.globalBin, 'bin is global bin after prefix setter')
-      t.notEqual(npm.bin, npm.localBin, 'bin is not local bin after prefix setter')
+      t.not(npm.bin, npm.localBin, 'bin is not local bin after prefix setter')
 
       beWindows()
       t.equal(npm.bin, npm.globalBin, 'bin is global bin in windows mode')
@@ -215,7 +215,7 @@ t.test('npm.load', t => {
 
     t.equal(npm.loaded, false, 'not loaded yet')
     t.equal(npm.loading, true, 'working on it tho')
-    t.isa(p, Promise, 'npm.load() returned a Promise first time')
+    t.type(p, Promise, 'npm.load() returned a Promise first time')
     t.equal(npm.load(second), undefined,
       'npm.load() returns nothing second time')
 
@@ -355,7 +355,7 @@ t.test('npm.load', t => {
     await new Promise((res) => setTimeout(res))
   })
 
-  t.test('workpaces-aware configs and commands', async t => {
+  t.test('workspace-aware configs and commands', async t => {
     const dir = t.testdir({
       packages: {
         a: {
@@ -438,6 +438,60 @@ t.test('npm.load', t => {
     })
   })
 
+  t.test('workspaces in global mode', async t => {
+    const dir = t.testdir({
+      packages: {
+        a: {
+          'package.json': JSON.stringify({
+            name: 'a',
+            version: '1.0.0',
+            scripts: { test: 'echo test a' },
+          }),
+        },
+        b: {
+          'package.json': JSON.stringify({
+            name: 'b',
+            version: '1.0.0',
+            scripts: { test: 'echo test b' },
+          }),
+        },
+      },
+      'package.json': JSON.stringify({
+        name: 'root',
+        version: '1.0.0',
+        workspaces: ['./packages/*'],
+      }),
+    })
+    const { execPath } = process
+    freshConfig({
+      argv: [
+        execPath,
+        process.argv[1],
+        '--userconfig',
+        resolve(dir, '.npmrc'),
+        '--color',
+        'false',
+        '--workspaces',
+        '--global',
+        'true',
+      ],
+    })
+    await npm.load(er => {
+      if (er)
+        throw er
+    })
+    npm.localPrefix = dir
+    await new Promise((res, rej) => {
+      // verify that calling the command with a short name still sets
+      // the npm.command property to the full canonical name of the cmd.
+      npm.command = null
+      npm.commands.run([], er => {
+        t.match(er, /Workspaces not supported for global packages/)
+        res()
+      })
+    })
+  })
+
   t.end()
 })
 
@@ -477,10 +531,7 @@ t.test('set process.title', t => {
     freshConfig()
   })
 
-  t.afterEach(cb => {
-    consoleLogs.length = 0
-    cb()
-  })
+  t.afterEach(() => consoleLogs.length = 0)
 
   t.test('basic title setting', async t => {
     freshConfig({

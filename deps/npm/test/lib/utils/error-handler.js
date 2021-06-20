@@ -1,7 +1,7 @@
 /* eslint-disable no-extend-native */
 /* eslint-disable no-global-assign */
 const EventEmitter = require('events')
-const requireInject = require('require-inject')
+const writeFileAtomic = require('write-file-atomic')
 const t = require('tap')
 
 // NOTE: Although these unit tests may look like the rest on the surface,
@@ -24,13 +24,10 @@ const redactCwd = (path) => {
 t.cleanSnapshot = (str) => redactCwd(str)
 
 // internal modules mocks
-const cacheFile = {
-  append: () => null,
-  write: () => null,
-}
+const cacheFolder = t.testdir({})
 const config = {
   values: {
-    cache: 'cachefolder',
+    cache: cacheFolder,
     timing: true,
   },
   loaded: true,
@@ -105,27 +102,27 @@ process = Object.assign(
       cb()
     } },
     stderr: { write () {} },
+    hrtime: _process.hrtime,
   }
 )
 // needs to put process back in its place
 // in order for tap to exit properly
 t.teardown(() => {
   process = _process
+  npmlog.record.length = 0
 })
 
 const mocks = {
   npmlog,
-  '../../../lib/npm.js': npm,
   '../../../lib/utils/error-message.js': (err) => ({
     ...err,
     summary: [['ERR', err.message]],
     detail: [['ERR', err.message]],
   }),
-  '../../../lib/utils/cache-file.js': cacheFile,
 }
 
-requireInject.installGlobally('../../../lib/utils/error-handler.js', mocks)
-let errorHandler = require('../../../lib/utils/error-handler.js')
+let errorHandler = t.mock('../../../lib/utils/error-handler.js', mocks)
+errorHandler.setNpm(npm)
 
 t.test('default exit code', (t) => {
   t.plan(1)
@@ -161,10 +158,14 @@ t.test('default exit code', (t) => {
 t.test('handles unknown error', (t) => {
   t.plan(2)
 
-  cacheFile.write = (filename, content) => {
+  const _toISOString = Date.prototype.toISOString
+  Date.prototype.toISOString = () => 'expecteddate'
+
+  const sync = writeFileAtomic.sync
+  writeFileAtomic.sync = (filename, content) => {
     t.equal(
       redactCwd(filename),
-      '{CWD}/cachefolder/_logs/expecteddate-debug.log',
+      '{CWD}/test/lib/utils/tap-testdir-error-handler/_logs/expecteddate-debug.log',
       'should use expected log filename'
     )
     t.matchSnapshot(
@@ -176,7 +177,8 @@ t.test('handles unknown error', (t) => {
   errorHandler(err)
 
   t.teardown(() => {
-    cacheFile.write = () => null
+    writeFileAtomic.sync = sync
+    Date.prototype.toISOString = _toISOString
   })
   t.end()
 })
@@ -206,11 +208,14 @@ t.test('npm.config not ready', (t) => {
 t.test('fail to write logfile', (t) => {
   t.plan(1)
 
-  cacheFile.write = () => {
-    throw err
-  }
+  const badDir = t.testdir({
+    _logs: 'is a file',
+  })
+
+  config.values.cache = badDir
+
   t.teardown(() => {
-    cacheFile.write = () => null
+    config.values.cache = cacheFolder
   })
 
   t.doesNotThrow(
@@ -226,7 +231,7 @@ t.test('console.log output using --json', (t) => {
 
   const _error = console.error
   console.error = (jsonOutput) => {
-    t.deepEqual(
+    t.same(
       JSON.parse(jsonOutput),
       {
         error: {
@@ -258,7 +263,7 @@ t.test('throw a non-error obj', (t) => {
   const _logError = npmlog.error
   npmlog.error = (title, err) => {
     t.equal(title, 'weird error', 'should name it a weird error')
-    t.deepEqual(err, weirdError, 'should log given weird error')
+    t.same(err, weirdError, 'should log given weird error')
   }
 
   const _exit = process.exit
@@ -282,7 +287,7 @@ t.test('throw a string error', (t) => {
   const _logError = npmlog.error
   npmlog.error = (title, err) => {
     t.equal(title, '', 'should have an empty name ref')
-    t.deepEqual(err, 'foo bar', 'should log string error')
+    t.same(err, 'foo bar', 'should log string error')
   }
 
   const _exit = process.exit
@@ -372,9 +377,8 @@ t.test('it worked', (t) => {
 t.test('uses code from errno', (t) => {
   t.plan(1)
 
-  // RESET MODULE INTERNAL VARS AND GLOBAL REFS
-  requireInject.installGlobally.andClearCache('../../../lib/utils/error-handler.js', mocks)
-  errorHandler = require('../../../lib/utils/error-handler.js')
+  errorHandler = t.mock('../../../lib/utils/error-handler.js', mocks)
+  errorHandler.setNpm(npm)
 
   npmlog.level = 'silent'
   const _exit = process.exit
@@ -398,12 +402,8 @@ t.test('uses code from errno', (t) => {
 t.test('uses exitCode as code if using a number', (t) => {
   t.plan(1)
 
-  // RESET MODULE INTERNAL VARS AND GLOBAL REFS
-  requireInject.installGlobally.andClearCache(
-    '../../../lib/utils/error-handler.js',
-    mocks
-  )
-  errorHandler = require('../../../lib/utils/error-handler.js')
+  errorHandler = t.mock('../../../lib/utils/error-handler.js', mocks)
+  errorHandler.setNpm(npm)
 
   npmlog.level = 'silent'
   const _exit = process.exit
@@ -427,12 +427,8 @@ t.test('uses exitCode as code if using a number', (t) => {
 t.test('call errorHandler with no error', (t) => {
   t.plan(1)
 
-  // RESET MODULE INTERNAL VARS AND GLOBAL REFS
-  requireInject.installGlobally.andClearCache(
-    '../../../lib/utils/error-handler.js',
-    mocks
-  )
-  errorHandler = require('../../../lib/utils/error-handler.js')
+  errorHandler = t.mock('../../../lib/utils/error-handler.js', mocks)
+  errorHandler.setNpm(npm)
 
   const _exit = process.exit
   process.exit = (code) => {
@@ -490,12 +486,8 @@ t.test('defaults to log error msg if stack is missing', (t) => {
 t.test('set it worked', (t) => {
   t.plan(1)
 
-  // RESET MODULE INTERNAL VARS AND GLOBAL REFS
-  requireInject.installGlobally.andClearCache(
-    '../../../lib/utils/error-handler.js',
-    mocks
-  )
-  errorHandler = require('../../../lib/utils/error-handler.js')
+  errorHandler = t.mock('../../../lib/utils/error-handler.js', mocks)
+  errorHandler.setNpm(npm)
 
   const _exit = process.exit
   process.exit = () => {
@@ -550,10 +542,7 @@ t.test('do no fancy handling for shellouts', t => {
     t.equal(code, EXPECT_EXIT, 'got expected exit code')
     EXPECT_EXIT = 0
   }
-  t.beforeEach((cb) => {
-    LOG_RECORD.length = 0
-    cb()
-  })
+  t.beforeEach(() => LOG_RECORD.length = 0)
 
   const loudNoises = () => LOG_RECORD
     .filter(({ level }) => ['warn', 'error'].includes(level))

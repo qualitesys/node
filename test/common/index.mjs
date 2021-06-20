@@ -30,6 +30,7 @@ const {
   allowGlobals,
   mustCall,
   mustCallAtLeast,
+  mustSucceed,
   hasMultiLocalhost,
   skipIfDumbTerminal,
   skipIfEslintMissing,
@@ -46,7 +47,6 @@ const {
   skipIf32Bits,
   getArrayBufferViews,
   getBufferSources,
-  disableCrashOnUnhandledRejection,
   getTTYfd,
   runWithInvalidFD
 } = common;
@@ -76,6 +76,7 @@ export {
   allowGlobals,
   mustCall,
   mustCallAtLeast,
+  mustSucceed,
   hasMultiLocalhost,
   skipIfDumbTerminal,
   skipIfEslintMissing,
@@ -92,7 +93,6 @@ export {
   skipIf32Bits,
   getArrayBufferViews,
   getBufferSources,
-  disableCrashOnUnhandledRejection,
   getTTYfd,
   runWithInvalidFD,
   createRequire

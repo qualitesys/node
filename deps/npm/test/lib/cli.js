@@ -25,6 +25,7 @@ const unsupportedMock = {
 }
 
 let errorHandlerCalled = null
+let errorHandlerNpm = null
 let errorHandlerCb
 const errorHandlerMock = (...args) => {
   errorHandlerCalled = args
@@ -35,6 +36,9 @@ let errorHandlerExitCalled = null
 errorHandlerMock.exit = code => {
   errorHandlerExitCalled = code
 }
+errorHandlerMock.setNpm = npm => {
+  errorHandlerNpm = npm
+}
 
 const logs = []
 const npmlogMock = {
@@ -43,9 +47,9 @@ const npmlogMock = {
   info: (...msg) => logs.push(['info', ...msg]),
 }
 
-const requireInject = require('require-inject')
-const cli = requireInject.installGlobally('../../lib/cli.js', {
+const cli = t.mock('../../lib/cli.js', {
   '../../lib/npm.js': npmock,
+  '../../lib/utils/update-notifier.js': async () => null,
   '../../lib/utils/did-you-mean.js': () => '\ntest did you mean',
   '../../lib/utils/unsupported.js': unsupportedMock,
   '../../lib/utils/error-handler.js': errorHandlerMock,
@@ -181,6 +185,7 @@ t.test('gracefully handles error printing usage', t => {
   npmock.argv = []
   errorHandlerCb = () => {
     t.match(errorHandlerCalled, [], 'should call errorHandler with no args')
+    t.match(errorHandlerNpm, npmock, 'errorHandler npm is set')
     t.end()
   }
   cli(proc)

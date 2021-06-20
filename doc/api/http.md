@@ -113,7 +113,9 @@ http.get({
 <!-- YAML
 added: v0.3.4
 changes:
-  - version: v15.6.0
+  - version:
+      - v15.6.0
+      - v14.17.0
     pr-url: https://github.com/nodejs/node/pull/36685
     description: Change the default scheduling from 'fifo' to 'lifo'.
   - version:
@@ -272,7 +274,7 @@ terminates them.
 <!-- YAML
 added: v0.11.4
 changes:
-  - version: REPLACEME
+  - version: v16.0.0
     pr-url: https://github.com/nodejs/node/pull/36409
     description: The property now has a `null` prototype.
 -->
@@ -342,7 +344,7 @@ can have open. Unlike `maxSockets`, this parameter applies across all origins.
 <!-- YAML
 added: v0.5.9
 changes:
-  - version: REPLACEME
+  - version: v16.0.0
     pr-url: https://github.com/nodejs/node/pull/36409
     description: The property now has a `null` prototype.
 -->
@@ -356,7 +358,7 @@ sockets. Do not modify.
 <!-- YAML
 added: v0.3.6
 changes:
-  - version: REPLACEME
+  - version: v16.0.0
     pr-url: https://github.com/nodejs/node/pull/36409
     description: The property now has a `null` prototype.
 -->
@@ -779,7 +781,9 @@ const cookie = request.getHeader('Cookie');
 
 ### `request.getRawHeaderNames()`
 <!-- YAML
-added: v15.13.0
+added:
+  - v15.13.0
+  - v14.17.0
 -->
 
 * Returns: {string[]}
@@ -1027,11 +1031,11 @@ added: v0.1.29
 * `callback` {Function}
 * Returns: {boolean}
 
-Sends a chunk of the body. By calling this method
-many times, a request body can be sent to a
-server. In that case, it is suggested to use the
-`['Transfer-Encoding', 'chunked']` header line when
-creating the request.
+Sends a chunk of the body. This method can be called multiple times. If no
+`Content-Length` is set, data will automatically be encoded in HTTP Chunked
+transfer encoding, so that server knows when the data ends. The
+`Transfer-Encoding: chunked` header is added. Calling [`request.end()`][]
+is necessary to finish sending the request.
 
 The `encoding` argument is optional and only applies when `chunk` is a string.
 Defaults to `'utf8'`.
@@ -2020,7 +2024,7 @@ const req = http.request({
 ### `message.connection`
 <!-- YAML
 added: v0.1.90
-deprecated: REPLACEME
+deprecated: v16.0.0
  -->
 
 > Stability: 0 - Deprecated. Use [`message.socket`][].
@@ -2314,7 +2318,9 @@ will result in a `TypeError` being thrown.
 ### `outgoingMessage.connection`
 <!-- YAML
 added: v0.3.0
-deprecated: v15.12.0
+deprecated:
+  - v15.12.0
+  - v14.17.1
 -->
 
 > Stability: 0 - Deprecated: Use [`outgoingMessage.socket`][] instead.
@@ -2797,7 +2803,9 @@ This can be overridden for servers and client requests by passing the
 <!-- YAML
 added: v0.3.6
 changes:
-  - version: v15.3.0
+  - version:
+      - v15.3.0
+      - v14.17.0
     pr-url: https://github.com/nodejs/node/pull/36048
     description: It is possible to abort a request with an AbortSignal.
   - version:
@@ -2892,7 +2900,9 @@ class. The `ClientRequest` instance is a writable stream. If one needs to
 upload a file with a POST request, then write to the `ClientRequest` object.
 
 ```js
-const postData = querystring.stringify({
+const http = require('http');
+
+const postData = JSON.stringify({
   'msg': 'Hello World!'
 });
 
@@ -2902,7 +2912,7 @@ const options = {
   path: '/upload',
   method: 'POST',
   headers: {
-    'Content-Type': 'application/x-www-form-urlencoded',
+    'Content-Type': 'application/json',
     'Content-Length': Buffer.byteLength(postData)
   }
 };
