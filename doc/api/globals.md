@@ -335,7 +335,7 @@ within each turn of the Node.js event loop.
 // before any other promise jobs.
 
 DataHandler.prototype.load = async function load(key) {
-  const hit = this._cache.get(url);
+  const hit = this._cache.get(key);
   if (hit !== undefined) {
     queueMicrotask(() => {
       this.emit('load', hit);
@@ -344,7 +344,7 @@ DataHandler.prototype.load = async function load(key) {
   }
 
   const data = await fetchData(key);
-  this._cache.set(url, data);
+  this._cache.set(key, data);
   this.emit('load', data);
 };
 ```
@@ -379,6 +379,15 @@ added: v0.0.1
 <!-- type=global -->
 
 [`setTimeout`][] is described in the [timers][] section.
+
+## `DOMException`
+<!-- YAML
+added: REPLACEME
+-->
+
+<!-- type=global -->
+
+The WHATWG `DOMException` class. See [`DOMException`][] for more details.
 
 ## `TextDecoder`
 <!-- YAML
@@ -430,6 +439,7 @@ The object that acts as the namespace for all W3C
 [Mozilla Developer Network][webassembly-mdn] for usage and compatibility.
 
 [`AbortController`]: https://developer.mozilla.org/en-US/docs/Web/API/AbortController
+[`DOMException`]: https://developer.mozilla.org/en-US/docs/Web/API/DOMException
 [`EventTarget` and `Event` API]: events.md#event-target-and-event-api
 [`MessageChannel`]: worker_threads.md#worker_threads_class_messagechannel
 [`MessageEvent`]: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent/MessageEvent

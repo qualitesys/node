@@ -411,6 +411,35 @@ This is a destructive and immediate way to destroy a stream. Previous calls to
 Use `end()` instead of destroy if data should flush before close, or wait for
 the `'drain'` event before destroying the stream.
 
+```cjs
+const { Writable } = require('stream');
+
+const myStream = new Writable();
+
+const fooErr = new Error('foo error');
+myStream.destroy(fooErr);
+myStream.on('error', (fooErr) => console.error(fooErr.message)); // foo error
+```
+
+```cjs
+const { Writable } = require('stream');
+
+const myStream = new Writable();
+
+myStream.destroy();
+myStream.on('error', function wontHappen() {});
+```
+
+```cjs
+const { Writable } = require('stream');
+
+const myStream = new Writable();
+myStream.destroy();
+
+myStream.write('foo', (error) => console.error(error.code));
+// ERR_STREAM_DESTROYED
+```
+
 Once `destroy()` has been called any further calls will be a no-op and no
 further errors except from `_destroy()` may be emitted as `'error'`.
 
@@ -425,6 +454,16 @@ added: v8.0.0
 * {boolean}
 
 Is `true` after [`writable.destroy()`][writable-destroy] has been called.
+
+```cjs
+const { Writable } = require('stream');
+
+const myStream = new Writable();
+
+console.log(myStream.destroyed); // false
+myStream.destroy();
+console.log(myStream.destroyed); // true
+```
 
 ##### `writable.end([chunk[, encoding]][, callback])`
 <!-- YAML
@@ -1222,6 +1261,28 @@ added: v11.4.0
 Is `true` if it is safe to call [`readable.read()`][stream-read], which means
 the stream has not been destroyed or emitted `'error'` or `'end'`.
 
+##### `readable.readableAborted`
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1 - Experimental
+
+* {boolean}
+
+Returns whether the stream was destroyed or errored before emitting `'end'`.
+
+##### `readable.readableDidRead`
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1 - Experimental
+
+* {boolean}
+
+Returns whether `'data'` has been emitted.
+
 ##### `readable.readableEncoding`
 <!-- YAML
 added: v12.7.0
@@ -1511,7 +1572,7 @@ If the loop terminates with a `break`, `return`, or a `throw`, the stream will
 be destroyed. In other terms, iterating over a stream will consume the stream
 fully. The stream will be read in chunks of size equal to the `highWaterMark`
 option. In the code example above, data will be in a single chunk if the file
-has less then 64KB of data because no `highWaterMark` option is provided to
+has less then 64 KB of data because no `highWaterMark` option is provided to
 [`fs.createReadStream()`][].
 
 ##### `readable.iterator([options])`
@@ -1525,9 +1586,6 @@ added: v16.3.0
   * `destroyOnReturn` {boolean} When set to `false`, calling `return` on the
     async iterator, or exiting a `for await...of` iteration using a `break`,
     `return`, or `throw` will not destroy the stream. **Default:** `true`.
-  * `destroyOnError` {boolean} When set to `false`, if the stream emits an
-    error while it's being iterated, the iterator will not destroy the stream.
-    **Default:** `true`.
 * Returns: {AsyncIterator} to consume the stream.
 
 The iterator created by this method gives users the option to cancel the
@@ -1859,6 +1917,95 @@ run().catch(console.error);
 after the `callback` has been invoked. In the case of reuse of streams after
 failure, this can cause event listener leaks and swallowed errors.
 
+### `stream.compose(...streams)`
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1 - `stream.compose` is experimental.
+
+* `streams` {Stream[]|Iterable[]|AsyncIterable[]|Function[]}
+* Returns: {stream.Duplex}
+
+Combines two or more streams into a `Duplex` stream that writes to the
+first stream and reads from the last. Each provided stream is piped into
+the next, using `stream.pipeline`. If any of the streams error then all
+are destroyed, including the outer `Duplex` stream.
+
+Because `stream.compose` returns a new stream that in turn can (and
+should) be piped into other streams, it enables composition. In contrast,
+when passing streams to `stream.pipeline`, typically the first stream is
+a readable stream and the last a writable stream, forming a closed
+circuit.
+
+If passed a `Function` it must be a factory method taking a `source`
+`Iterable`.
+
+```mjs
+import { compose, Transform } from 'stream';
+
+const removeSpaces = new Transform({
+  transform(chunk, encoding, callback) {
+    callback(null, String(chunk).replace(' ', ''));
+  }
+});
+
+async function* toUpper(source) {
+  for await (const chunk of source) {
+    yield String(chunk).toUpperCase();
+  }
+}
+
+let res = '';
+for await (const buf of compose(removeSpaces, toUpper).end('hello world')) {
+  res += buf;
+}
+
+console.log(res); // prints 'HELLOWORLD'
+```
+
+`stream.compose` can be used to convert async iterables, generators and
+functions into streams.
+
+* `AsyncIterable` converts into a readable `Duplex`. Cannot yield
+  `null`.
+* `AsyncGeneratorFunction` converts into a readable/writable transform `Duplex`.
+  Must take a source `AsyncIterable` as first parameter. Cannot yield
+  `null`.
+* `AsyncFunction` converts into a writable `Duplex`. Must return
+  either `null` or `undefined`.
+
+```mjs
+import { compose } from 'stream';
+import { finished } from 'stream/promises';
+
+// Convert AsyncIterable into readable Duplex.
+const s1 = compose(async function*() {
+  yield 'Hello';
+  yield 'World';
+}());
+
+// Convert AsyncGenerator into transform Duplex.
+const s2 = compose(async function*(source) {
+  for await (const chunk of source) {
+    yield String(chunk).toUpperCase();
+  }
+});
+
+let res = '';
+
+// Convert AsyncFunction into writable Duplex.
+const s3 = compose(async function(source) {
+  for await (const chunk of source) {
+    res += chunk;
+  }
+});
+
+await finished(compose(s1, s2, s3));
+
+console.log(res); // prints 'HELLOWORLD'
+```
+
 ### `stream.Readable.from(iterable, [options])`
 <!-- YAML
 added:
@@ -1894,6 +2041,127 @@ readable.on('data', (chunk) => {
 Calling `Readable.from(string)` or `Readable.from(buffer)` will not have
 the strings or buffers be iterated to match the other streams semantics
 for performance reasons.
+
+### `stream.Readable.fromWeb(readableStream[, options])`
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1 - Experimental
+
+* `readableStream` {ReadableStream}
+* `options` {Object}
+  * `encoding` {string}
+  * `highWaterMark` {number}
+  * `objectModel` {boolean}
+  * `signal` {AbortSignal}
+* Returns: {stream.Readable}
+
+### `stream.Readable.isDisturbed(stream)`
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1 - Experimental
+
+* `stream` {stream.Readable|ReadableStream}
+* Returns: `boolean`
+
+Returns whether the stream has been read from or cancelled.
+
+### `stream.Readable.toWeb(streamReadable)`
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1 - Experimental
+
+* `streamReadable` {stream.Readable}
+* Returns: {ReadableStream}
+
+### `stream.Writable.fromWeb(writableStream[, options])`
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1 - Experimental
+
+* `writableStream` {WritableStream}
+* `options` {Object}
+  * `decodeStrings` {boolean}
+  * `highWaterMark` {number}
+  * `objectMode` {boolean}
+  * `signal` {AbortSignal}
+* Returns: {stream.Writable}
+
+### `stream.Writable.toWeb(streamWritable)`
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1 - Experimental
+
+* `streamWritable` {stream.Writable}
+* Returns: {WritableStream}
+
+### `stream.Duplex.from(src)`
+<!-- YAML
+added: REPLACEME
+-->
+
+* `src` {Stream|Blob|ArrayBuffer|string|Iterable|AsyncIterable|
+  AsyncGeneratorFunction|AsyncFunction|Promise|Object}
+
+A utility method for creating duplex streams.
+
+* `Stream` converts writable stream into writable `Duplex` and readable stream
+  to `Duplex`.
+* `Blob` converts into readable `Duplex`.
+* `string` converts into readable `Duplex`.
+* `ArrayBuffer` converts into readable `Duplex`.
+* `AsyncIterable` converts into a readable `Duplex`. Cannot yield
+  `null`.
+* `AsyncGeneratorFunction` converts into a readable/writable transform
+  `Duplex`. Must take a source `AsyncIterable` as first parameter. Cannot yield
+  `null`.
+* `AsyncFunction` converts into a writable `Duplex`. Must return
+  either `null` or `undefined`
+* `Object ({ writable, readable })` converts `readable` and
+  `writable` into `Stream` and then combines them into `Duplex` where the
+  `Duplex` will write to the `writable` and read from the `readable`.
+* `Promise` converts into readable `Duplex`. Value `null` is ignored.
+* Returns: {stream.Duplex}
+
+### `stream.Duplex.fromWeb(pair[, options])`
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1 - Experimental
+
+* `pair` {Object}
+  * `readable` {ReadableStream}
+  * `writable` {WritableStream}
+* `options` {Object}
+  * `allowHalfOpen` {boolean}
+  * `decodeStrings` {boolean}
+  * `encoding` {string}
+  * `highWaterMark` {number}
+  * `objectMode` {boolean}
+  * `signal` {AbortSignal}
+* Returns: {stream.Duplex}
+
+### `stream.Duplex.toWeb(streamDuplex)`
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1 - Experimental
+
+* `streamDuplex` {stream.Duplex}
+* Returns: {Object}
+  * `readable` {ReadableStream}
+  * `writable` {WritableStream}
 
 ### `stream.addAbortSignal(signal, stream)`
 <!-- YAML
@@ -2055,7 +2323,7 @@ changes:
 * `options` {Object}
   * `highWaterMark` {number} Buffer level when
     [`stream.write()`][stream-write] starts returning `false`. **Default:**
-    `16384` (16KB), or `16` for `objectMode` streams.
+    `16384` (16 KB), or `16` for `objectMode` streams.
   * `decodeStrings` {boolean} Whether to encode `string`s passed to
     [`stream.write()`][stream-write] to `Buffer`s (with the encoding
     specified in the [`stream.write()`][stream-write] call) before passing
@@ -2418,7 +2686,7 @@ changes:
 * `options` {Object}
   * `highWaterMark` {number} The maximum [number of bytes][hwm-gotcha] to store
     in the internal buffer before ceasing to read from the underlying resource.
-    **Default:** `16384` (16KB), or `16` for `objectMode` streams.
+    **Default:** `16384` (16 KB), or `16` for `objectMode` streams.
   * `encoding` {string} If specified, then buffers will be decoded to
     strings using the specified encoding. **Default:** `null`.
   * `objectMode` {boolean} Whether this stream should behave
@@ -3295,6 +3563,7 @@ contain multi-byte characters.
 [HTTP requests, on the client]: http.md#http_class_http_clientrequest
 [HTTP responses, on the server]: http.md#http_class_http_serverresponse
 [TCP sockets]: net.md#net_class_net_socket
+[Three states]: #stream_three_states
 [`'data'`]: #stream_event_data
 [`'drain'`]: #stream_event_drain
 [`'end'`]: #stream_event_end
@@ -3316,11 +3585,11 @@ contain multi-byte characters.
 [`readable.push('')`]: #stream_readable_push
 [`readable.setEncoding()`]: #stream_readable_setencoding_encoding
 [`stream.Readable.from()`]: #stream_stream_readable_from_iterable_options
+[`stream.addAbortSignal()`]: #stream_stream_addabortsignal_signal_stream
 [`stream.cork()`]: #stream_writable_cork
 [`stream.finished()`]: #stream_stream_finished_stream_options_callback
 [`stream.pipe()`]: #stream_readable_pipe_destination_options
 [`stream.pipeline()`]: #stream_stream_pipeline_source_transforms_destination_callback
-[`stream.addAbortSignal()`]: #stream_stream_addabortsignal_signal_stream
 [`stream.uncork()`]: #stream_writable_uncork
 [`stream.unpipe()`]: #stream_readable_unpipe_destination
 [`stream.wrap()`]: #stream_readable_wrap_stream
@@ -3356,7 +3625,6 @@ contain multi-byte characters.
 [stream-resume]: #stream_readable_resume
 [stream-uncork]: #stream_writable_uncork
 [stream-write]: #stream_writable_write_chunk_encoding_callback
-[Three states]: #stream_three_states
 [writable-_construct]: #stream_writable_construct_callback
 [writable-_destroy]: #stream_writable_destroy_err_callback
 [writable-destroy]: #stream_writable_destroy_error

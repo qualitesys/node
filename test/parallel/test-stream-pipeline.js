@@ -1035,7 +1035,7 @@ const net = require('net');
   const dst = new PassThrough();
   dst.readable = false;
   pipeline(src, dst, common.mustSucceed(() => {
-    assert.strictEqual(dst.destroyed, false);
+    assert.strictEqual(dst.destroyed, true);
   }));
   src.end();
 }
@@ -1386,37 +1386,4 @@ const net = require('net');
   }, common.mustSucceed(() => {
     assert.strictEqual(res, content);
   }));
-}
-
-{
-  const writableLike = new Stream();
-  writableLike.writableNeedDrain = true;
-
-  pipeline(
-    async function *() {},
-    writableLike,
-    common.mustCall((err) => {
-      assert.strictEqual(err.code, 'ERR_STREAM_PREMATURE_CLOSE');
-    })
-  );
-
-  writableLike.emit('close');
-}
-
-{
-  const writableLike = new Stream();
-  writableLike.write = () => false;
-
-  pipeline(
-    async function *() {
-      yield null;
-      yield null;
-    },
-    writableLike,
-    common.mustCall((err) => {
-      assert.strictEqual(err.code, 'ERR_STREAM_PREMATURE_CLOSE');
-    })
-  );
-
-  writableLike.emit('close');
 }

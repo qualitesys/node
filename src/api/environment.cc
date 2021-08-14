@@ -20,8 +20,11 @@ using v8::Function;
 using v8::FunctionCallbackInfo;
 using v8::HandleScope;
 using v8::Isolate;
+using v8::Just;
 using v8::Local;
+using v8::Maybe;
 using v8::MaybeLocal;
+using v8::Nothing;
 using v8::Null;
 using v8::Object;
 using v8::ObjectTemplate;
@@ -501,7 +504,7 @@ MaybeLocal<Object> GetPerContextExports(Local<Context> context) {
 
   Local<Object> exports = Object::New(isolate);
   if (context->Global()->SetPrivate(context, key, exports).IsNothing() ||
-      !InitializePrimordials(context))
+      InitializePrimordials(context).IsNothing())
     return MaybeLocal<Object>();
   return handle_scope.Escape(exports);
 }
@@ -514,7 +517,7 @@ Local<Context> NewContext(Isolate* isolate,
   auto context = Context::New(isolate, nullptr, object_template);
   if (context.IsEmpty()) return context;
 
-  if (!InitializeContext(context)) {
+  if (InitializeContext(context).IsNothing()) {
     return Local<Context>();
   }
 
@@ -527,70 +530,126 @@ void ProtoThrower(const FunctionCallbackInfo<Value>& info) {
 
 // This runs at runtime, regardless of whether the context
 // is created from a snapshot.
-void InitializeContextRuntime(Local<Context> context) {
+Maybe<bool> InitializeContextRuntime(Local<Context> context) {
   Isolate* isolate = context->GetIsolate();
   HandleScope handle_scope(isolate);
 
   // Delete `Intl.v8BreakIterator`
   // https://github.com/nodejs/node/issues/14909
-  Local<String> intl_string = FIXED_ONE_BYTE_STRING(isolate, "Intl");
-  Local<String> break_iter_string =
-    FIXED_ONE_BYTE_STRING(isolate, "v8BreakIterator");
-  Local<Value> intl_v;
-  if (context->Global()->Get(context, intl_string).ToLocal(&intl_v) &&
-      intl_v->IsObject()) {
-    Local<Object> intl = intl_v.As<Object>();
-    intl->Delete(context, break_iter_string).Check();
+  {
+    Local<String> intl_string =
+      FIXED_ONE_BYTE_STRING(isolate, "Intl");
+    Local<String> break_iter_string =
+      FIXED_ONE_BYTE_STRING(isolate, "v8BreakIterator");
+
+    Local<Value> intl_v;
+    if (!context->Global()
+        ->Get(context, intl_string)
+        .ToLocal(&intl_v)) {
+      return Nothing<bool>();
+    }
+
+    if (intl_v->IsObject() &&
+        intl_v.As<Object>()
+          ->Delete(context, break_iter_string)
+          .IsNothing()) {
+      return Nothing<bool>();
+    }
   }
 
   // Delete `Atomics.wake`
   // https://github.com/nodejs/node/issues/21219
-  Local<String> atomics_string = FIXED_ONE_BYTE_STRING(isolate, "Atomics");
-  Local<String> wake_string = FIXED_ONE_BYTE_STRING(isolate, "wake");
-  Local<Value> atomics_v;
-  if (context->Global()->Get(context, atomics_string).ToLocal(&atomics_v) &&
-      atomics_v->IsObject()) {
-    Local<Object> atomics = atomics_v.As<Object>();
-    atomics->Delete(context, wake_string).Check();
+  {
+    Local<String> atomics_string =
+      FIXED_ONE_BYTE_STRING(isolate, "Atomics");
+    Local<String> wake_string =
+      FIXED_ONE_BYTE_STRING(isolate, "wake");
+
+    Local<Value> atomics_v;
+    if (!context->Global()
+        ->Get(context, atomics_string)
+        .ToLocal(&atomics_v)) {
+      return Nothing<bool>();
+    }
+
+    if (atomics_v->IsObject() &&
+        atomics_v.As<Object>()
+          ->Delete(context, wake_string)
+          .IsNothing()) {
+      return Nothing<bool>();
+    }
   }
 
   // Remove __proto__
   // https://github.com/nodejs/node/issues/31951
-  Local<String> object_string = FIXED_ONE_BYTE_STRING(isolate, "Object");
-  Local<String> prototype_string = FIXED_ONE_BYTE_STRING(isolate, "prototype");
-  Local<Object> prototype = context->Global()
-                                ->Get(context, object_string)
-                                .ToLocalChecked()
-                                .As<Object>()
-                                ->Get(context, prototype_string)
-                                .ToLocalChecked()
-                                .As<Object>();
-  Local<String> proto_string = FIXED_ONE_BYTE_STRING(isolate, "__proto__");
+  Local<Object> prototype;
+  {
+    Local<String> object_string =
+      FIXED_ONE_BYTE_STRING(isolate, "Object");
+    Local<String> prototype_string =
+      FIXED_ONE_BYTE_STRING(isolate, "prototype");
+
+    Local<Value> object_v;
+    if (!context->Global()
+        ->Get(context, object_string)
+        .ToLocal(&object_v)) {
+      return Nothing<bool>();
+    }
+
+    Local<Value> prototype_v;
+    if (!object_v.As<Object>()
+        ->Get(context, prototype_string)
+        .ToLocal(&prototype_v)) {
+      return Nothing<bool>();
+    }
+
+    prototype = prototype_v.As<Object>();
+  }
+
+  Local<String> proto_string =
+    FIXED_ONE_BYTE_STRING(isolate, "__proto__");
+
   if (per_process::cli_options->disable_proto == "delete") {
-    prototype->Delete(context, proto_string).ToChecked();
+    if (prototype
+        ->Delete(context, proto_string)
+        .IsNothing()) {
+      return Nothing<bool>();
+    }
   } else if (per_process::cli_options->disable_proto == "throw") {
-    Local<Value> thrower =
-        Function::New(context, ProtoThrower).ToLocalChecked();
+    Local<Value> thrower;
+    if (!Function::New(context, ProtoThrower)
+        .ToLocal(&thrower)) {
+      return Nothing<bool>();
+    }
+
     PropertyDescriptor descriptor(thrower, thrower);
     descriptor.set_enumerable(false);
     descriptor.set_configurable(true);
-    prototype->DefineProperty(context, proto_string, descriptor).ToChecked();
+    if (prototype
+        ->DefineProperty(context, proto_string, descriptor)
+        .IsNothing()) {
+      return Nothing<bool>();
+    }
   } else if (per_process::cli_options->disable_proto != "") {
     // Validated in ProcessGlobalArgs
-    FatalError("InitializeContextRuntime()", "invalid --disable-proto mode");
+    FatalError("InitializeContextRuntime()",
+               "invalid --disable-proto mode");
   }
+
+  return Just(true);
 }
 
-bool InitializeContextForSnapshot(Local<Context> context) {
+Maybe<bool> InitializeContextForSnapshot(Local<Context> context) {
   Isolate* isolate = context->GetIsolate();
   HandleScope handle_scope(isolate);
 
   context->SetEmbedderData(ContextEmbedderIndex::kAllowWasmCodeGeneration,
                            True(isolate));
+
   return InitializePrimordials(context);
 }
 
-bool InitializePrimordials(Local<Context> context) {
+Maybe<bool> InitializePrimordials(Local<Context> context) {
   // Run per-context JS files.
   Isolate* isolate = context->GetIsolate();
   Context::Scope context_scope(context);
@@ -603,10 +662,10 @@ bool InitializePrimordials(Local<Context> context) {
 
   // Create primordials first and make it available to per-context scripts.
   Local<Object> primordials = Object::New(isolate);
-  if (!primordials->SetPrototype(context, Null(isolate)).FromJust() ||
+  if (primordials->SetPrototype(context, Null(isolate)).IsNothing() ||
       !GetPerContextExports(context).ToLocal(&exports) ||
-      !exports->Set(context, primordials_string, primordials).FromJust()) {
-    return false;
+      exports->Set(context, primordials_string, primordials).IsNothing()) {
+    return Nothing<bool>();
   }
 
   static const char* context_files[] = {"internal/per_context/primordials",
@@ -623,27 +682,25 @@ bool InitializePrimordials(Local<Context> context) {
             context, *module, &parameters, nullptr);
     Local<Function> fn;
     if (!maybe_fn.ToLocal(&fn)) {
-      return false;
+      return Nothing<bool>();
     }
     MaybeLocal<Value> result =
         fn->Call(context, Undefined(isolate), arraysize(arguments), arguments);
     // Execution failed during context creation.
-    // TODO(joyeecheung): deprecate this signature and return a MaybeLocal.
     if (result.IsEmpty()) {
-      return false;
+      return Nothing<bool>();
     }
   }
 
-  return true;
+  return Just(true);
 }
 
-bool InitializeContext(Local<Context> context) {
-  if (!InitializeContextForSnapshot(context)) {
-    return false;
+Maybe<bool> InitializeContext(Local<Context> context) {
+  if (InitializeContextForSnapshot(context).IsNothing()) {
+    return Nothing<bool>();
   }
 
-  InitializeContextRuntime(context);
-  return true;
+  return InitializeContextRuntime(context);
 }
 
 uv_loop_t* GetCurrentEventLoop(Isolate* isolate) {

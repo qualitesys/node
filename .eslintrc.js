@@ -98,6 +98,14 @@ module.exports = {
           name: 'require',
           message: 'Use import instead',
         },
+        {
+          name: 'Buffer',
+          message: 'Import Buffer instead of using the global'
+        },
+        {
+          name: 'process',
+          message: 'Import process instead of using the global'
+        },
       ] },
     },
   ],
@@ -341,6 +349,7 @@ module.exports = {
     BigInt: 'readable',
     BigInt64Array: 'readable',
     BigUint64Array: 'readable',
+    DOMException: 'readable',
     Event: 'readable',
     EventTarget: 'readable',
     MessageChannel: 'readable',

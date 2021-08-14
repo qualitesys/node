@@ -170,7 +170,6 @@ constexpr size_t kFsStatsBufferLength =
   V(oninit_symbol, "oninit")                                                   \
   V(owner_symbol, "owner_symbol")                                              \
   V(onpskexchange_symbol, "onpskexchange")                                     \
-  V(resource_symbol, "resource_symbol")                                        \
   V(trigger_async_id_symbol, "trigger_async_id_symbol")                        \
 
 // Strings are per-isolate primitives but Environment proxies them
@@ -211,6 +210,7 @@ constexpr size_t kFsStatsBufferLength =
   V(crypto_rsa_pss_string, "rsa-pss")                                          \
   V(cwd_string, "cwd")                                                         \
   V(data_string, "data")                                                       \
+  V(default_is_true_string, "defaultIsTrue")                                   \
   V(deserialize_info_string, "deserializeInfo")                                \
   V(dest_string, "dest")                                                       \
   V(destroyed_string, "destroyed")                                             \
@@ -519,6 +519,8 @@ constexpr size_t kFsStatsBufferLength =
   V(internal_binding_loader, v8::Function)                                     \
   V(immediate_callback_function, v8::Function)                                 \
   V(inspector_console_extension_installer, v8::Function)                       \
+  V(inspector_disable_async_hooks, v8::Function)                               \
+  V(inspector_enable_async_hooks, v8::Function)                                \
   V(messaging_deserialize_create_object, v8::Function)                         \
   V(message_port, v8::Object)                                                  \
   V(native_module_require, v8::Function)                                       \

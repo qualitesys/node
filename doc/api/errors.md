@@ -1010,7 +1010,9 @@ An attempt to invoke an unsupported crypto operation was made.
 <a id="ERR_DEBUGGER_ERROR"></a>
 ### `ERR_DEBUGGER_ERROR`
 <!-- YAML
-added: REPLACEME
+added:
+  - v16.4.0
+  - v14.17.4
 -->
 
 An error occurred with the [debugger][].
@@ -1018,7 +1020,9 @@ An error occurred with the [debugger][].
 <a id="ERR_DEBUGGER_STARTUP_ERROR"></a>
 ### `ERR_DEBUGGER_STARTUP_ERROR`
 <!-- YAML
-added: REPLACEME
+added:
+  - v16.4.0
+  - v14.17.4
 -->
 
 The [debugger][] timed out waiting for the required host/port to be free.
@@ -1110,6 +1114,74 @@ added: v14.0.0
 
 Used when a feature that is not available
 to the current platform which is running Node.js is used.
+
+<a id="ERR_FS_CP_DIR_TO_NON_DIR"></a>
+### `ERR_FS_CP_DIR_TO_NON_DIR`
+<!--
+added: REPLACEME
+-->
+
+An attempt was made to copy a directory to a non-directory (file, symlink,
+etc.) using [`fs.cp()`][].
+
+<a id="ERR_FS_CP_EEXIST"></a>
+### `ERR_FS_CP_EEXIST`
+<!--
+added: REPLACEME
+-->
+
+An attempt was made to copy over a file that already existed with
+[`fs.cp()`][], with the `force` and `errorOnExist` set to `true`.
+
+<a id="ERR_FS_CP_EINVAL"></a>
+### `ERR_FS_CP_EINVAL`
+<!--
+added: REPLACEME
+-->
+
+When using [`fs.cp()`][], `src` or `dest` pointed to an invalid path.
+
+<a id="ERR_FS_CP_FIFO_PIPE"></a>
+### `ERR_FS_CP_FIFO_PIPE`
+<!--
+added: REPLACEME
+-->
+
+An attempt was made to copy a named pipe with [`fs.cp()`][].
+
+<a id="ERR_FS_CP_NON_DIR_TO_DIR"></a>
+### `ERR_FS_CP_NON_DIR_TO_DIR`
+<!--
+added: REPLACEME
+-->
+
+An attempt was made to copy a non-directory (file, symlink, etc.) to a directory
+using [`fs.cp()`][].
+
+<a id="ERR_FS_CP_SOCKET"></a>
+### `ERR_FS_CP_SOCKET`
+<!--
+added: REPLACEME
+-->
+
+An attempt was made to copy to a socket with [`fs.cp()`][].
+
+<a id="ERR_FS_CP_SYMLINK_TO_SUBDIRECTORY"></a>
+### `ERR_FS_CP_SYMLINK_TO_SUBDIRECTORY`
+<!--
+added: REPLACEME
+-->
+
+When using [`fs.cp()`][], a symlink in `dest` pointed to a subdirectory
+of `src`.
+
+<a id="ERR_FS_CP_UNKNOWN"></a>
+### `ERR_FS_CP_UNKNOWN`
+<!--
+added: REPLACEME
+-->
+
+An attempt was made to copy to an unknown file type with [`fs.cp()`][].
 
 <a id="ERR_FS_EISDIR"></a>
 ### `ERR_FS_EISDIR`
@@ -1427,6 +1499,11 @@ is set for the `Http2Stream`.
 
 `http2.connect()` was passed a URL that uses any protocol other than `http:` or
 `https:`.
+
+<a id="ERR_ILLEGAL_CONSTRUCTOR"></a>
+### `ERR_ILLEGAL_CONSTRUCTOR`
+
+An attempt was made to construct an object using a non-public constructor.
 
 <a id="ERR_INCOMPATIBLE_OPTION_PAIR"></a>
 ### `ERR_INCOMPATIBLE_OPTION_PAIR`
@@ -2451,11 +2528,11 @@ changes:
      - v10.15.0
     commit: 186035243fad247e3955f
     pr-url: https://github.com/nodejs-private/node-private/pull/143
-    description: Max header size in `http_parser` was set to 8KB.
+    description: Max header size in `http_parser` was set to 8 KB.
 -->
 
 Too much HTTP header data was received. In order to protect against malicious or
-malconfigured clients, if more than 8KB of HTTP header data is received then
+malconfigured clients, if more than 8 KB of HTTP header data is received then
 HTTP parsing will abort without a request or response object being created, and
 an `Error` with this code will be emitted.
 
@@ -2813,6 +2890,7 @@ The native call from `process.cpuUsage` could not be processed.
 [`dgram.remoteAddress()`]: dgram.md#dgram_socket_remoteaddress
 [`errno`(3) man page]: https://man7.org/linux/man-pages/man3/errno.3.html
 [`fs.Dir`]: fs.md#fs_class_fs_dir
+[`fs.cp()`]: fs.md#fs_fs_cp_src_dest_options_callback
 [`fs.readFileSync`]: fs.md#fs_fs_readfilesync_path_options
 [`fs.readdir`]: fs.md#fs_fs_readdir_path_options_callback
 [`fs.symlink()`]: fs.md#fs_fs_symlink_target_path_type_callback
@@ -2829,7 +2907,7 @@ The native call from `process.cpuUsage` could not be processed.
 [`new URLSearchParams(iterable)`]: url.md#url_new_urlsearchparams_iterable
 [`package.json`]: packages.md#packages_node_js_package_json_field_definitions
 [`postMessage()`]: worker_threads.md#worker_threads_port_postmessage_value_transferlist
-[`process.on('exit')`]: process.md#Event:-`'exit'`
+[`process.on('exit')`]: process.md#process_event_exit
 [`process.send()`]: process.md#process_process_send_message_sendhandle_options_callback
 [`process.setUncaughtExceptionCaptureCallback()`]: process.md#process_process_setuncaughtexceptioncapturecallback_fn
 [`readable._read()`]: stream.md#stream_readable_read_size_1
