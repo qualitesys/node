@@ -1263,7 +1263,7 @@ added: REPLACEME
 
 * Type: {ReadableStream}
 
-#### `deccompressionStream.writable`
+#### `decompressionStream.writable`
 <!-- YAML
 added: REPLACEME
 -->
@@ -1272,7 +1272,7 @@ added: REPLACEME
 
 ### Utility Consumers
 <!-- YAML
-added: REPLACEME
+added: v16.7.0
 -->
 
 The utility consumer functions provide common options for consuming
@@ -1300,7 +1300,7 @@ const {
 
 #### `streamConsumers.arrayBuffer(stream)`
 <!-- YAML
-added: REPLACEME
+added: v16.7.0
 -->
 
 * `stream` {ReadableStream|stream.Readable|AsyncIterator}
@@ -1309,7 +1309,7 @@ added: REPLACEME
 
 #### `streamConsumers.blob(stream)`
 <!-- YAML
-added: REPLACEME
+added: v16.7.0
 -->
 
 * `stream` {ReadableStream|stream.Readable|AsyncIterator}
@@ -1318,7 +1318,7 @@ added: REPLACEME
 
 #### `streamConsumers.buffer(stream)`
 <!-- YAML
-added: REPLACEME
+added: v16.7.0
 -->
 
 * `stream` {ReadableStream|stream.Readable|AsyncIterator}
@@ -1327,7 +1327,7 @@ added: REPLACEME
 
 #### `streamConsumers.json(stream)`
 <!-- YAML
-added: REPLACEME
+added: v16.7.0
 -->
 
 * `stream` {ReadableStream|stream.Readable|AsyncIterator}
@@ -1336,7 +1336,7 @@ added: REPLACEME
 
 #### `streamConsumers.text(stream)`
 <!-- YAML
-added: REPLACEME
+added: v16.7.0
 -->
 
 * `stream` {ReadableStream|stream.Readable|AsyncIterator}

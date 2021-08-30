@@ -1118,7 +1118,7 @@ to the current platform which is running Node.js is used.
 <a id="ERR_FS_CP_DIR_TO_NON_DIR"></a>
 ### `ERR_FS_CP_DIR_TO_NON_DIR`
 <!--
-added: REPLACEME
+added: v16.7.0
 -->
 
 An attempt was made to copy a directory to a non-directory (file, symlink,
@@ -1127,7 +1127,7 @@ etc.) using [`fs.cp()`][].
 <a id="ERR_FS_CP_EEXIST"></a>
 ### `ERR_FS_CP_EEXIST`
 <!--
-added: REPLACEME
+added: v16.7.0
 -->
 
 An attempt was made to copy over a file that already existed with
@@ -1136,7 +1136,7 @@ An attempt was made to copy over a file that already existed with
 <a id="ERR_FS_CP_EINVAL"></a>
 ### `ERR_FS_CP_EINVAL`
 <!--
-added: REPLACEME
+added: v16.7.0
 -->
 
 When using [`fs.cp()`][], `src` or `dest` pointed to an invalid path.
@@ -1144,7 +1144,7 @@ When using [`fs.cp()`][], `src` or `dest` pointed to an invalid path.
 <a id="ERR_FS_CP_FIFO_PIPE"></a>
 ### `ERR_FS_CP_FIFO_PIPE`
 <!--
-added: REPLACEME
+added: v16.7.0
 -->
 
 An attempt was made to copy a named pipe with [`fs.cp()`][].
@@ -1152,7 +1152,7 @@ An attempt was made to copy a named pipe with [`fs.cp()`][].
 <a id="ERR_FS_CP_NON_DIR_TO_DIR"></a>
 ### `ERR_FS_CP_NON_DIR_TO_DIR`
 <!--
-added: REPLACEME
+added: v16.7.0
 -->
 
 An attempt was made to copy a non-directory (file, symlink, etc.) to a directory
@@ -1161,7 +1161,7 @@ using [`fs.cp()`][].
 <a id="ERR_FS_CP_SOCKET"></a>
 ### `ERR_FS_CP_SOCKET`
 <!--
-added: REPLACEME
+added: v16.7.0
 -->
 
 An attempt was made to copy to a socket with [`fs.cp()`][].
@@ -1169,7 +1169,7 @@ An attempt was made to copy to a socket with [`fs.cp()`][].
 <a id="ERR_FS_CP_SYMLINK_TO_SUBDIRECTORY"></a>
 ### `ERR_FS_CP_SYMLINK_TO_SUBDIRECTORY`
 <!--
-added: REPLACEME
+added: v16.7.0
 -->
 
 When using [`fs.cp()`][], a symlink in `dest` pointed to a subdirectory
@@ -1178,7 +1178,7 @@ of `src`.
 <a id="ERR_FS_CP_UNKNOWN"></a>
 ### `ERR_FS_CP_UNKNOWN`
 <!--
-added: REPLACEME
+added: v16.7.0
 -->
 
 An attempt was made to copy to an unknown file type with [`fs.cp()`][].
@@ -1842,6 +1842,13 @@ A policy manifest resource had an invalid value for one of its fields. Update
 the manifest entry to match in order to resolve this error. See the
 documentation for [policy][] manifests for more information.
 
+<a id="ERR_MANIFEST_INVALID_SPECIFIER"></a>
+### `ERR_MANIFEST_INVALID_SPECIFIER`
+
+A policy manifest resource had an invalid value for one of its dependency
+mappings. Update the manifest entry to match to resolve this error. See the
+documentation for [policy][] manifests for more information.
+
 <a id="ERR_MANIFEST_PARSE_POLICY"></a>
 ### `ERR_MANIFEST_PARSE_POLICY`
 
@@ -2503,12 +2510,6 @@ nor a relative path starting with `./` or `../`.
 
 All attempts at serializing an uncaught exception from a worker thread failed.
 
-<a id="ERR_WORKER_UNSUPPORTED_EXTENSION"></a>
-### `ERR_WORKER_UNSUPPORTED_EXTENSION`
-
-The pathname used for the main script of a worker has an
-unknown file extension.
-
 <a id="ERR_WORKER_UNSUPPORTED_OPERATION"></a>
 ### `ERR_WORKER_UNSUPPORTED_OPERATION`
 
@@ -2835,6 +2836,16 @@ Used when a given value is out of the accepted range.
 
 The module must be successfully linked before instantiation.
 
+<a id="ERR_WORKER_UNSUPPORTED_EXTENSION"></a>
+### `ERR_WORKER_UNSUPPORTED_EXTENSION`
+<!-- YAML
+added: v11.0.0
+removed: REPLACEME
+-->
+
+The pathname used for the main script of a worker has an
+unknown file extension.
+
 <a id="ERR_ZLIB_BINDING_CLOSED"></a>
 ### `ERR_ZLIB_BINDING_CLOSED`
 <!-- YAML
@@ -2854,85 +2865,85 @@ removed: v15.0.0
 The native call from `process.cpuUsage` could not be processed.
 
 [ES Module]: esm.md
-[ICU]: intl.md#intl_internationalization_support
+[ICU]: intl.md#internationalization-support
 [JSON Web Key Elliptic Curve Registry]: https://www.iana.org/assignments/jose/jose.xhtml#web-key-elliptic-curve
 [JSON Web Key Types Registry]: https://www.iana.org/assignments/jose/jose.xhtml#web-key-types
 [Node.js error codes]: #nodejs-error-codes
 [RFC 7230 Section 3]: https://tools.ietf.org/html/rfc7230#section-3
 [Subresource Integrity specification]: https://www.w3.org/TR/SRI/#the-integrity-attribute
 [V8's stack trace API]: https://github.com/v8/v8/wiki/Stack-Trace-API
-[WHATWG Supported Encodings]: util.md#util_whatwg_supported_encodings
-[WHATWG URL API]: url.md#url_the_whatwg_url_api
-[`"exports"`]: packages.md#packages_exports
-[`"imports"`]: packages.md#packages_imports
-[`'uncaughtException'`]: process.md#process_event_uncaughtexception
-[`--disable-proto=throw`]: cli.md#cli_disable_proto_mode
-[`--force-fips`]: cli.md#cli_force_fips
-[`Class: assert.AssertionError`]: assert.md#assert_class_assert_assertionerror
-[`ERR_INVALID_ARG_TYPE`]: #ERR_INVALID_ARG_TYPE
-[`ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST`]: #ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST
-[`ERR_MISSING_TRANSFERABLE_IN_TRANSFER_LIST`]: #ERR_MISSING_TRANSFERABLE_IN_TRANSFER_LIST
-[`EventEmitter`]: events.md#events_class_eventemitter
-[`MessagePort`]: worker_threads.md#worker_threads_class_messageport
+[WHATWG Supported Encodings]: util.md#whatwg-supported-encodings
+[WHATWG URL API]: url.md#the-whatwg-url-api
+[`"exports"`]: packages.md#exports
+[`"imports"`]: packages.md#imports
+[`'uncaughtException'`]: process.md#event-uncaughtexception
+[`--disable-proto=throw`]: cli.md#--disable-protomode
+[`--force-fips`]: cli.md#--force-fips
+[`Class: assert.AssertionError`]: assert.md#class-assertassertionerror
+[`ERR_INVALID_ARG_TYPE`]: #err_invalid_arg_type
+[`ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST`]: #err_missing_message_port_in_transfer_list
+[`ERR_MISSING_TRANSFERABLE_IN_TRANSFER_LIST`]: #err_missing_transferable_in_transfer_list
+[`EventEmitter`]: events.md#class-eventemitter
+[`MessagePort`]: worker_threads.md#class-messageport
 [`Object.getPrototypeOf`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/getPrototypeOf
 [`Object.setPrototypeOf`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/setPrototypeOf
 [`REPL`]: repl.md
-[`Writable`]: stream.md#stream_class_stream_writable
+[`Writable`]: stream.md#class-streamwritable
 [`child_process`]: child_process.md
-[`cipher.getAuthTag()`]: crypto.md#crypto_cipher_getauthtag
-[`crypto.getDiffieHellman()`]: crypto.md#crypto_crypto_getdiffiehellman_groupname
-[`crypto.scrypt()`]: crypto.md#crypto_crypto_scrypt_password_salt_keylen_options_callback
-[`crypto.scryptSync()`]: crypto.md#crypto_crypto_scryptsync_password_salt_keylen_options
-[`crypto.timingSafeEqual()`]: crypto.md#crypto_crypto_timingsafeequal_a_b
-[`dgram.connect()`]: dgram.md#dgram_socket_connect_port_address_callback
-[`dgram.createSocket()`]: dgram.md#dgram_dgram_createsocket_options_callback
-[`dgram.disconnect()`]: dgram.md#dgram_socket_disconnect
-[`dgram.remoteAddress()`]: dgram.md#dgram_socket_remoteaddress
+[`cipher.getAuthTag()`]: crypto.md#ciphergetauthtag
+[`crypto.getDiffieHellman()`]: crypto.md#cryptogetdiffiehellmangroupname
+[`crypto.scrypt()`]: crypto.md#cryptoscryptpassword-salt-keylen-options-callback
+[`crypto.scryptSync()`]: crypto.md#cryptoscryptsyncpassword-salt-keylen-options
+[`crypto.timingSafeEqual()`]: crypto.md#cryptotimingsafeequala-b
+[`dgram.connect()`]: dgram.md#socketconnectport-address-callback
+[`dgram.createSocket()`]: dgram.md#dgramcreatesocketoptions-callback
+[`dgram.disconnect()`]: dgram.md#socketdisconnect
+[`dgram.remoteAddress()`]: dgram.md#socketremoteaddress
 [`errno`(3) man page]: https://man7.org/linux/man-pages/man3/errno.3.html
-[`fs.Dir`]: fs.md#fs_class_fs_dir
-[`fs.cp()`]: fs.md#fs_fs_cp_src_dest_options_callback
-[`fs.readFileSync`]: fs.md#fs_fs_readfilesync_path_options
-[`fs.readdir`]: fs.md#fs_fs_readdir_path_options_callback
-[`fs.symlink()`]: fs.md#fs_fs_symlink_target_path_type_callback
-[`fs.symlinkSync()`]: fs.md#fs_fs_symlinksync_target_path_type
-[`fs.unlink`]: fs.md#fs_fs_unlink_path_callback
+[`fs.Dir`]: fs.md#class-fsdir
+[`fs.cp()`]: fs.md#fscpsrc-dest-options-callback
+[`fs.readFileSync`]: fs.md#fsreadfilesyncpath-options
+[`fs.readdir`]: fs.md#fsreaddirpath-options-callback
+[`fs.symlink()`]: fs.md#fssymlinktarget-path-type-callback
+[`fs.symlinkSync()`]: fs.md#fssymlinksynctarget-path-type
+[`fs.unlink`]: fs.md#fsunlinkpath-callback
 [`fs`]: fs.md
-[`hash.digest()`]: crypto.md#crypto_hash_digest_encoding
-[`hash.update()`]: crypto.md#crypto_hash_update_data_inputencoding
+[`hash.digest()`]: crypto.md#hashdigestencoding
+[`hash.update()`]: crypto.md#hashupdatedata-inputencoding
 [`http`]: http.md
 [`https`]: https.md
 [`libuv Error handling`]: https://docs.libuv.org/en/v1.x/errors.html
 [`net`]: net.md
-[`new URL(input)`]: url.md#url_new_url_input_base
-[`new URLSearchParams(iterable)`]: url.md#url_new_urlsearchparams_iterable
-[`package.json`]: packages.md#packages_node_js_package_json_field_definitions
-[`postMessage()`]: worker_threads.md#worker_threads_port_postmessage_value_transferlist
-[`process.on('exit')`]: process.md#process_event_exit
-[`process.send()`]: process.md#process_process_send_message_sendhandle_options_callback
-[`process.setUncaughtExceptionCaptureCallback()`]: process.md#process_process_setuncaughtexceptioncapturecallback_fn
-[`readable._read()`]: stream.md#stream_readable_read_size_1
-[`require('crypto').setEngine()`]: crypto.md#crypto_crypto_setengine_engine_flags
-[`require()`]: modules.md#modules_require_id
-[`server.close()`]: net.md#net_server_close_callback
-[`server.listen()`]: net.md#net_server_listen
-[`sign.sign()`]: crypto.md#crypto_sign_sign_privatekey_outputencoding
-[`stream.pipe()`]: stream.md#stream_readable_pipe_destination_options
-[`stream.push()`]: stream.md#stream_readable_push_chunk_encoding
-[`stream.unshift()`]: stream.md#stream_readable_unshift_chunk_encoding
-[`stream.write()`]: stream.md#stream_writable_write_chunk_encoding_callback
-[`subprocess.kill()`]: child_process.md#child_process_subprocess_kill_signal
-[`subprocess.send()`]: child_process.md#child_process_subprocess_send_message_sendhandle_options_callback
-[`url.parse()`]: url.md#url_url_parse_urlstring_parsequerystring_slashesdenotehost
-[`util.getSystemErrorName(error.errno)`]: util.md#util_util_getsystemerrorname_err
+[`new URL(input)`]: url.md#new-urlinput-base
+[`new URLSearchParams(iterable)`]: url.md#new-urlsearchparamsiterable
+[`package.json`]: packages.md#nodejs-packagejson-field-definitions
+[`postMessage()`]: worker_threads.md#portpostmessagevalue-transferlist
+[`process.on('exit')`]: process.md#event-exit
+[`process.send()`]: process.md#processsendmessage-sendhandle-options-callback
+[`process.setUncaughtExceptionCaptureCallback()`]: process.md#processsetuncaughtexceptioncapturecallbackfn
+[`readable._read()`]: stream.md#readable_readsize
+[`require('crypto').setEngine()`]: crypto.md#cryptosetengineengine-flags
+[`require()`]: modules.md#requireid
+[`server.close()`]: net.md#serverclosecallback
+[`server.listen()`]: net.md#serverlisten
+[`sign.sign()`]: crypto.md#signsignprivatekey-outputencoding
+[`stream.pipe()`]: stream.md#readablepipedestination-options
+[`stream.push()`]: stream.md#readablepushchunk-encoding
+[`stream.unshift()`]: stream.md#readableunshiftchunk-encoding
+[`stream.write()`]: stream.md#writablewritechunk-encoding-callback
+[`subprocess.kill()`]: child_process.md#subprocesskillsignal
+[`subprocess.send()`]: child_process.md#subprocesssendmessage-sendhandle-options-callback
+[`url.parse()`]: url.md#urlparseurlstring-parsequerystring-slashesdenotehost
+[`util.getSystemErrorName(error.errno)`]: util.md#utilgetsystemerrornameerr
 [`zlib`]: zlib.md
-[crypto digest algorithm]: crypto.md#crypto_crypto_gethashes
+[crypto digest algorithm]: crypto.md#cryptogethashes
 [debugger]: debugger.md
-[define a custom subpath]: packages.md#packages_subpath_exports
+[define a custom subpath]: packages.md#subpath-exports
 [domains]: domain.md
-[event emitter-based]: events.md#events_class_eventemitter
+[event emitter-based]: events.md#class-eventemitter
 [file descriptors]: https://en.wikipedia.org/wiki/File_descriptor
 [policy]: policy.md
-[self-reference a package using its name]: packages.md#packages_self_referencing_a_package_using_its_name
+[self-reference a package using its name]: packages.md#self-referencing-a-package-using-its-name
 [stream-based]: stream.md
 [syscall]: https://man7.org/linux/man-pages/man2/syscalls.2.html
 [try-catch]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch

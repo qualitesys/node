@@ -363,7 +363,7 @@ An error will be thrown if the given `typedArray` is larger than 65,536 bytes.
 
 ### `crypto.randomUUID()`
 <!-- YAML
-added: REPLACEME
+added: v16.7.0
 -->
 
 * Returns: {string}
@@ -1278,7 +1278,7 @@ added: v15.0.0
 added: v15.0.0
 -->
 
-* Type: {string} Must be `'HMAC`.
+* Type: {string} Must be `'HMAC'`.
 
 ### Class: `Pbkdf2ImportParams`
 <!-- YAML
@@ -1780,6 +1780,6 @@ added: v15.0.0
 * Type: {string|ArrayBuffer|Buffer|TypedArray|DataView}
 
 [JSON Web Key]: https://tools.ietf.org/html/rfc7517
-[Key usages]: #webcrypto_cryptokey_usages
+[Key usages]: #cryptokeyusages
 [RFC 4122]: https://www.rfc-editor.org/rfc/rfc4122.txt
 [Web Crypto API]: https://www.w3.org/TR/WebCryptoAPI/

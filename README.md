@@ -152,6 +152,8 @@ For information on reporting security vulnerabilities in Node.js, see
 For information about the governance of the Node.js project, see
 [GOVERNANCE.md](./GOVERNANCE.md).
 
+<!-- node-core-utils depends on the format of the TSC list. If the
+     format changes, those utilities need to be tested and updated. -->
 ### TSC (Technical Steering Committee)
 
 <!--lint disable prohibited-strings-->
@@ -249,6 +251,9 @@ For information about the governance of the Node.js project, see
 
 </details>
 
+<!-- node-core-utils and find-inactive-collaborators.mjs depend on the format
+     of the collaborator list. If the format changes, those utilities need to be
+     tested and updated. -->
 ### Collaborators
 
 * [addaleax](https://github.com/addaleax) -
@@ -462,6 +467,8 @@ For information about the governance of the Node.js project, see
 
 <summary>Emeriti</summary>
 
+<!-- find-inactive-collaborators.mjs depends on the format of the emeriti list.
+     If the format changes, those utilities need to be tested and updated. -->
 ### Collaborator emeriti
 
 * [andrasq](https://github.com/andrasq) -
@@ -613,12 +620,20 @@ maintaining the Node.js project.
 
 * [Ayase-252](https://github.com/Ayase-252) -
 **Qingyu Deng** &lt;i@ayase-lab.com&gt;
+* [himadriganguly](https://github.com/himadriganguly) -
+**Himadri Ganguly** &lt;himadri.tech@gmail.com&gt; (he/him)
+* [iam-frankqiu](https://github.com/iam-frankqiu) -
+**Frank Qiu** &lt;iam.frankqiu@gmail.com&gt; (he/him)
 * [marsonya](https://github.com/marsonya) -
 **Akhil Marsonya** &lt;akhil.marsonya27@gmail.com&gt; (he/him)
+* [Mesteery](https://github.com/Mesteery) -
+**Mestery** &lt;mestery@pm.me&gt;
 * [PoojaDurgad](https://github.com/PoojaDurgad) -
 **Pooja Durgad** &lt;Pooja.D.P@ibm.com&gt;
 * [RaisinTen](https://github.com/RaisinTen) -
 **Darshan Sen** &lt;raisinten@gmail.com&gt;
+* [VoltrexMaster](https://github.com/VoltrexMaster) -
+**Voltrex** &lt;mohammadkeyvanzade94@gmail.com&gt; (he/him)
 
 ### Release keys
 

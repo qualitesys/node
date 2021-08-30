@@ -459,14 +459,20 @@ multiple worker threads.
 ### `new buffer.Blob([sources[, options]])`
 <!-- YAML
 added: v15.7.0
+changes:
+  - version: v16.7.0
+    pr-url: https://github.com/nodejs/node/pull/39708
+    description: Added the standard `endings` option to replace line-endings,
+                 and removed the non-standard `encoding` option.
 -->
 
 * `sources` {string[]|ArrayBuffer[]|TypedArray[]|DataView[]|Blob[]} An array
   of string, {ArrayBuffer}, {TypedArray}, {DataView}, or {Blob} objects, or
   any mix of such objects, that will be stored within the `Blob`.
 * `options` {Object}
-  * `encoding` {string} The character encoding to use for string sources.
-    **Default:** `'utf8'`.
+  * `endings` {string} One of either `'transparent'` or `'native'`. When set
+    to `'native'`, line endings in string source parts will be converted to
+    the platform native line-ending as specified by `require('os').EOL`.
   * `type` {string} The Blob content-type. The intent is for `type` to convey
     the MIME media type of the data, however no validation of the type format
     is performed.
@@ -476,7 +482,9 @@ Creates a new `Blob` object containing a concatenation of the given sources.
 {ArrayBuffer}, {TypedArray}, {DataView}, and {Buffer} sources are copied into
 the 'Blob' and can therefore be safely modified after the 'Blob' is created.
 
-String sources are also copied into the `Blob`.
+String sources are encoded as UTF-8 byte sequences and copied into the Blob.
+Unmatched surrogate pairs within each string part will be replaced by Unicode
+U+FFFD replacement characters.
 
 ### `blob.arrayBuffer()`
 <!-- YAML
@@ -509,7 +517,7 @@ data. The original `Blob` is not altered.
 
 ### `blob.stream()`
 <!-- YAML
-added: REPLACEME
+added: v16.7.0
 -->
 
 * Returns: {ReadableStream}
@@ -4954,7 +4962,7 @@ An alias for [`buffer.constants.MAX_STRING_LENGTH`][].
 
 ### `buffer.resolveObjectURL(id)`
 <!-- YAML
-added: REPLACEME
+added: v16.7.0
 -->
 
 > Stability: 1 - Experimental
@@ -5191,19 +5199,19 @@ introducing security vulnerabilities into an application.
 [WHATWG Encoding Standard]: https://encoding.spec.whatwg.org/
 [`ArrayBuffer`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
 [`Blob`]: https://developer.mozilla.org/en-US/docs/Web/API/Blob
-[`Buffer.alloc()`]: #buffer_static_method_buffer_alloc_size_fill_encoding
-[`Buffer.allocUnsafe()`]: #buffer_static_method_buffer_allocunsafe_size
-[`Buffer.allocUnsafeSlow()`]: #buffer_static_method_buffer_allocunsafeslow_size
-[`Buffer.concat()`]: #buffer_static_method_buffer_concat_list_totallength
-[`Buffer.from(array)`]: #buffer_static_method_buffer_from_array
-[`Buffer.from(arrayBuf)`]: #buffer_static_method_buffer_from_arraybuffer_byteoffset_length
-[`Buffer.from(buffer)`]: #buffer_static_method_buffer_from_buffer
-[`Buffer.from(string)`]: #buffer_static_method_buffer_from_string_encoding
-[`Buffer.poolSize`]: #buffer_class_property_buffer_poolsize
+[`Buffer.alloc()`]: #static-method-bufferallocsize-fill-encoding
+[`Buffer.allocUnsafe()`]: #static-method-bufferallocunsafesize
+[`Buffer.allocUnsafeSlow()`]: #static-method-bufferallocunsafeslowsize
+[`Buffer.concat()`]: #static-method-bufferconcatlist-totallength
+[`Buffer.from(array)`]: #static-method-bufferfromarray
+[`Buffer.from(arrayBuf)`]: #static-method-bufferfromarraybuffer-byteoffset-length
+[`Buffer.from(buffer)`]: #static-method-bufferfrombuffer
+[`Buffer.from(string)`]: #static-method-bufferfromstring-encoding
+[`Buffer.poolSize`]: #class-property-bufferpoolsize
 [`DataView`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView
-[`ERR_INVALID_ARG_VALUE`]: errors.md#ERR_INVALID_ARG_VALUE
-[`ERR_INVALID_BUFFER_SIZE`]: errors.md#ERR_INVALID_BUFFER_SIZE
-[`ERR_OUT_OF_RANGE`]: errors.md#ERR_OUT_OF_RANGE
+[`ERR_INVALID_ARG_VALUE`]: errors.md#err_invalid_arg_value
+[`ERR_INVALID_BUFFER_SIZE`]: errors.md#err_invalid_buffer_size
+[`ERR_OUT_OF_RANGE`]: errors.md#err_out_of_range
 [`JSON.stringify()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
 [`SharedArrayBuffer`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer
 [`String.prototype.indexOf()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf
@@ -5215,20 +5223,20 @@ introducing security vulnerabilities into an application.
 [`TypedArray.prototype.subarray()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/subarray
 [`TypedArray`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray
 [`Uint8Array`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array
-[`buf.buffer`]: #buffer_buf_buffer
-[`buf.compare()`]: #buffer_buf_compare_target_targetstart_targetend_sourcestart_sourceend
-[`buf.entries()`]: #buffer_buf_entries
-[`buf.fill()`]: #buffer_buf_fill_value_offset_end_encoding
-[`buf.indexOf()`]: #buffer_buf_indexof_value_byteoffset_encoding
-[`buf.keys()`]: #buffer_buf_keys
-[`buf.length`]: #buffer_buf_length
-[`buf.slice()`]: #buffer_buf_slice_start_end
-[`buf.toString()`]: #buffer_buf_tostring_encoding_start_end
-[`buf.values()`]: #buffer_buf_values
-[`buffer.constants.MAX_LENGTH`]: #buffer_buffer_constants_max_length
-[`buffer.constants.MAX_STRING_LENGTH`]: #buffer_buffer_constants_max_string_length
-[`buffer.kMaxLength`]: #buffer_buffer_kmaxlength
-[`util.inspect()`]: util.md#util_util_inspect_object_options
+[`buf.buffer`]: #bufbuffer
+[`buf.compare()`]: #bufcomparetarget-targetstart-targetend-sourcestart-sourceend
+[`buf.entries()`]: #bufentries
+[`buf.fill()`]: #buffillvalue-offset-end-encoding
+[`buf.indexOf()`]: #bufindexofvalue-byteoffset-encoding
+[`buf.keys()`]: #bufkeys
+[`buf.length`]: #buflength
+[`buf.slice()`]: #bufslicestart-end
+[`buf.toString()`]: #buftostringencoding-start-end
+[`buf.values()`]: #bufvalues
+[`buffer.constants.MAX_LENGTH`]: #bufferconstantsmax_length
+[`buffer.constants.MAX_STRING_LENGTH`]: #bufferconstantsmax_string_length
+[`buffer.kMaxLength`]: #bufferkmaxlength
+[`util.inspect()`]: util.md#utilinspectobject-options
 [`v8::TypedArray::kMaxLength`]: https://v8.github.io/api/head/classv8_1_1TypedArray.html#a54a48f4373da0850663c4393d843b9b0
 [base64url]: https://tools.ietf.org/html/rfc4648#section-5
 [binary strings]: https://developer.mozilla.org/en-US/docs/Web/API/DOMString/Binary
