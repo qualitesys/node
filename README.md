@@ -171,8 +171,6 @@ For information about the governance of the Node.js project, see
 **Colin Ihrig** &lt;cjihrig@gmail.com&gt; (he/him)
 * [codebytere](https://github.com/codebytere) -
 **Shelley Vohr** &lt;shelley.vohr@gmail.com&gt; (she/her)
-* [danbev](https://github.com/danbev) -
-**Daniel Bevenius** &lt;daniel.bevenius@gmail.com&gt; (he/him)
 * [danielleadams](https://github.com/danielleadams) -
 **Danielle Adams** &lt;adamzdanielle@gmail.com&gt; (she/her)
 * [fhinkel](https://github.com/fhinkel) -
@@ -214,6 +212,8 @@ For information about the governance of the Node.js project, see
 **Ben Noordhuis** &lt;info@bnoordhuis.nl&gt;
 * [chrisdickinson](https://github.com/chrisdickinson) -
 **Chris Dickinson** &lt;christopher.s.dickinson@gmail.com&gt;
+* [danbev](https://github.com/danbev) -
+**Daniel Bevenius** &lt;daniel.bevenius@gmail.com&gt; (he/him)
 * [evanlucas](https://github.com/evanlucas) -
 **Evan Lucas** &lt;evanlucas@me.com&gt; (he/him)
 * [Fishrock123](https://github.com/Fishrock123) -
@@ -268,6 +268,8 @@ For information about the governance of the Node.js project, see
 **Anatoli Papirovski** &lt;apapirovski@mac.com&gt; (he/him)
 * [AshCripps](https://github.com/AshCripps) -
 **Ash Cripps** &lt;acripps@redhat.com&gt;
+* [Ayase-252](https://github.com/Ayase-252) -
+**Qingyu Deng** &lt;i@ayase-lab.com&gt;
 * [bcoe](https://github.com/bcoe) -
 **Ben Coe** &lt;bencoe@gmail.com&gt; (he/him)
 * [bengl](https://github.com/bengl) -
@@ -329,7 +331,7 @@ For information about the governance of the Node.js project, see
 * [gengjiawen](https://github.com/gengjiawen) -
 **Jiawen Geng** &lt;technicalcute@gmail.com&gt;
 * [GeoffreyBooth](https://github.com/geoffreybooth) -
-**Geoffrey Booth** &lt;webmaster@geoffreybooth.com&gt; (he/him)
+**Geoffrey Booth** &lt;webadmin@geoffreybooth.com&gt; (he/him)
 * [gireeshpunathil](https://github.com/gireeshpunathil) -
 **Gireesh Punathil** &lt;gpunathi@in.ibm.com&gt; (he/him)
 * [guybedford](https://github.com/guybedford) -

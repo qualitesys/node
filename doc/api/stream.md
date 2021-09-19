@@ -1954,7 +1954,7 @@ failure, this can cause event listener leaks and swallowed errors.
 
 ### `stream.compose(...streams)`
 <!-- YAML
-added: REPLACEME
+added: v16.9.0
 -->
 
 > Stability: 1 - `stream.compose` is experimental.
@@ -2041,7 +2041,7 @@ await finished(compose(s1, s2, s3));
 console.log(res); // prints 'HELLOWORLD'
 ```
 
-### `stream.Readable.from(iterable, [options])`
+### `stream.Readable.from(iterable[, options])`
 <!-- YAML
 added:
   - v12.3.0
