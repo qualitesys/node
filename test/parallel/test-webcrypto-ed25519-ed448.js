@@ -382,6 +382,21 @@ assert.rejects(
         assert.strictEqual(cryptoKey.algorithm.name, namedCurve);
       }, common.mustNotCall());
 
+      subtle.importKey(
+        keyObject.type === 'private' ? 'pkcs8' : 'spki',
+        keyObject.export({
+          format: 'der',
+          type: keyObject.type === 'private' ? 'pkcs8' : 'spki',
+        }),
+        { name: namedCurve, namedCurve },
+        true,
+        keyObject.type === 'private' ? ['sign'] : ['verify'],
+      ).then((cryptoKey) => {
+        assert.strictEqual(cryptoKey.type, keyObject.type);
+        assert.strictEqual(cryptoKey.algorithm.name, namedCurve);
+        assert.strictEqual(cryptoKey.algorithm.namedCurve, namedCurve);
+      }, common.mustNotCall());
+
       assert.rejects(
         subtle.importKey(
           'node.keyObject',
@@ -412,5 +427,55 @@ assert.rejects(
           message: /Invalid algorithm name/
         }).then(common.mustCall());
     }
+  }
+}
+
+{
+  // See: https://github.com/nodejs/node/pull/40300
+  for (const namedCurve of ['NODE-ED25519', 'NODE-ED448']) {
+    assert.rejects(
+      (async () => {
+        const { privateKey } = await generateKey(namedCurve);
+        return subtle.sign(
+          {
+            name: namedCurve,
+            hash: 'SHA-256'
+          },
+          privateKey,
+          Buffer.from('abc')
+        );
+      })(),
+      (err) => {
+        assert.strictEqual(err.message, `Hash is not permitted for ${namedCurve}`);
+        assert(err instanceof DOMException);
+        return true;
+      }).then(common.mustCall());
+
+    assert.rejects(
+      (async () => {
+        const { publicKey, privateKey } = await generateKey(namedCurve);
+        const signature = await subtle.sign(
+          {
+            name: namedCurve,
+          },
+          privateKey,
+          Buffer.from('abc')
+        ).catch(common.mustNotCall());
+
+        return subtle.verify(
+          {
+            name: namedCurve,
+            hash: 'SHA-256',
+          },
+          publicKey,
+          signature,
+          Buffer.from('abc')
+        );
+      })(),
+      (err) => {
+        assert.strictEqual(err.message, `Hash is not permitted for ${namedCurve}`);
+        assert(err instanceof DOMException);
+        return true;
+      }).then(common.mustCall());
   }
 }

@@ -25,14 +25,16 @@
 #if defined(NODE_WANT_INTERNALS) && NODE_WANT_INTERNALS
 
 #include "aliased_buffer.h"
+#include "allocated_buffer-inl.h"
 #include "callback_queue-inl.h"
 #include "env.h"
 #include "node.h"
+#include "node_context_data.h"
+#include "node_perf_common.h"
 #include "util-inl.h"
 #include "uv.h"
+#include "v8-fast-api-calls.h"
 #include "v8.h"
-#include "node_perf_common.h"
-#include "node_context_data.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -971,6 +973,29 @@ inline IsolateData* Environment::isolate_data() const {
   return isolate_data_;
 }
 
+inline uv_buf_t Environment::allocate_managed_buffer(
+    const size_t suggested_size) {
+  NoArrayBufferZeroFillScope no_zero_fill_scope(isolate_data());
+  std::unique_ptr<v8::BackingStore> bs =
+      v8::ArrayBuffer::NewBackingStore(isolate(), suggested_size);
+  uv_buf_t buf = uv_buf_init(static_cast<char*>(bs->Data()), bs->ByteLength());
+  released_allocated_buffers()->emplace(buf.base, std::move(bs));
+  return buf;
+}
+
+inline std::unique_ptr<v8::BackingStore> Environment::release_managed_buffer(
+    const uv_buf_t& buf) {
+  std::unique_ptr<v8::BackingStore> bs;
+  if (buf.base != nullptr) {
+    auto map = released_allocated_buffers();
+    auto it = map->find(buf.base);
+    CHECK_NE(it, map->end());
+    bs = std::move(it->second);
+    map->erase(it);
+  }
+  return bs;
+}
+
 std::unordered_map<char*, std::unique_ptr<v8::BackingStore>>*
     Environment::released_allocated_buffers() {
   return &released_allocated_buffers_;
@@ -1012,13 +1037,20 @@ inline void Environment::ThrowUVException(int errorno,
       UVException(isolate(), errorno, syscall, message, path, dest));
 }
 
-inline v8::Local<v8::FunctionTemplate>
-    Environment::NewFunctionTemplate(v8::FunctionCallback callback,
-                                     v8::Local<v8::Signature> signature,
-                                     v8::ConstructorBehavior behavior,
-                                     v8::SideEffectType side_effect_type) {
-  return v8::FunctionTemplate::New(isolate(), callback, v8::Local<v8::Value>(),
-                                   signature, 0, behavior, side_effect_type);
+inline v8::Local<v8::FunctionTemplate> Environment::NewFunctionTemplate(
+    v8::FunctionCallback callback,
+    v8::Local<v8::Signature> signature,
+    v8::ConstructorBehavior behavior,
+    v8::SideEffectType side_effect_type,
+    const v8::CFunction* c_function) {
+  return v8::FunctionTemplate::New(isolate(),
+                                   callback,
+                                   v8::Local<v8::Value>(),
+                                   signature,
+                                   0,
+                                   behavior,
+                                   side_effect_type,
+                                   c_function);
 }
 
 inline void Environment::SetMethod(v8::Local<v8::Object> that,
@@ -1037,6 +1069,25 @@ inline void Environment::SetMethod(v8::Local<v8::Object> that,
       v8::String::NewFromUtf8(isolate(), name, type).ToLocalChecked();
   that->Set(context, name_string, function).Check();
   function->SetName(name_string);  // NODE_SET_METHOD() compatibility.
+}
+
+inline void Environment::SetFastMethod(v8::Local<v8::Object> that,
+                                       const char* name,
+                                       v8::FunctionCallback slow_callback,
+                                       const v8::CFunction* c_function) {
+  v8::Local<v8::Context> context = isolate()->GetCurrentContext();
+  v8::Local<v8::Function> function =
+      NewFunctionTemplate(slow_callback,
+                          v8::Local<v8::Signature>(),
+                          v8::ConstructorBehavior::kThrow,
+                          v8::SideEffectType::kHasNoSideEffect,
+                          c_function)
+          ->GetFunction(context)
+          .ToLocalChecked();
+  const v8::NewStringType type = v8::NewStringType::kInternalized;
+  v8::Local<v8::String> name_string =
+      v8::String::NewFromUtf8(isolate(), name, type).ToLocalChecked();
+  that->Set(context, name_string, function).Check();
 }
 
 inline void Environment::SetMethodNoSideEffect(v8::Local<v8::Object> that,

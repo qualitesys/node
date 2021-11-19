@@ -175,7 +175,7 @@ inline static napi_status ConcludeDeferred(napi_env env,
   v8::Local<v8::Value> v8_deferred =
       v8::Local<v8::Value>::New(env->isolate, *deferred_ref);
 
-  auto v8_resolver = v8::Local<v8::Promise::Resolver>::Cast(v8_deferred);
+  auto v8_resolver = v8_deferred.As<v8::Promise::Resolver>();
 
   v8::Maybe<bool> success = is_resolved ?
       v8_resolver->Resolve(context, v8impl::V8LocalValueFromJsValue(result)) :
@@ -293,7 +293,7 @@ class CallbackWrapperBase : public CallbackWrapper {
                         nullptr),
         _cbinfo(cbinfo) {
     _bundle = reinterpret_cast<CallbackBundle*>(
-        v8::Local<v8::External>::Cast(cbinfo.Data())->Value());
+        cbinfo.Data().As<v8::External>()->Value());
     _data = _bundle->cb_data;
   }
 
@@ -761,12 +761,14 @@ napi_status napi_get_last_error_info(napi_env env,
       NAPI_ARRAYSIZE(error_messages) == last_status + 1,
       "Count of error messages must match count of error values");
   CHECK_LE(env->last_error.error_code, last_status);
-
   // Wait until someone requests the last error information to fetch the error
   // message string
   env->last_error.error_message =
       error_messages[env->last_error.error_code];
 
+  if (env->last_error.error_code == napi_ok) {
+     napi_clear_last_error(env);
+  }
   *result = &(env->last_error);
   return napi_ok;
 }
@@ -1747,6 +1749,26 @@ napi_status napi_create_range_error(napi_env env,
   return napi_clear_last_error(env);
 }
 
+napi_status node_api_create_syntax_error(napi_env env,
+                                         napi_value code,
+                                         napi_value msg,
+                                         napi_value* result) {
+  CHECK_ENV(env);
+  CHECK_ARG(env, msg);
+  CHECK_ARG(env, result);
+
+  v8::Local<v8::Value> message_value = v8impl::V8LocalValueFromJsValue(msg);
+  RETURN_STATUS_IF_FALSE(env, message_value->IsString(), napi_string_expected);
+
+  v8::Local<v8::Value> error_obj =
+      v8::Exception::SyntaxError(message_value.As<v8::String>());
+  STATUS_CALL(set_error_code(env, error_obj, code, nullptr));
+
+  *result = v8impl::JsValueFromV8LocalValue(error_obj);
+
+  return napi_clear_last_error(env);
+}
+
 napi_status napi_typeof(napi_env env,
                         napi_value value,
                         napi_valuetype* result) {
@@ -1956,6 +1978,24 @@ napi_status napi_throw_range_error(napi_env env,
   CHECK_NEW_FROM_UTF8(env, str, msg);
 
   v8::Local<v8::Value> error_obj = v8::Exception::RangeError(str);
+  STATUS_CALL(set_error_code(env, error_obj, nullptr, code));
+
+  isolate->ThrowException(error_obj);
+  // any VM calls after this point and before returning
+  // to the javascript invoker will fail
+  return napi_clear_last_error(env);
+}
+
+napi_status node_api_throw_syntax_error(napi_env env,
+                                        const char* code,
+                                        const char* msg) {
+  NAPI_PREAMBLE(env);
+
+  v8::Isolate* isolate = env->isolate;
+  v8::Local<v8::String> str;
+  CHECK_NEW_FROM_UTF8(env, str, msg);
+
+  v8::Local<v8::Value> error_obj = v8::Exception::SyntaxError(str);
   STATUS_CALL(set_error_code(env, error_obj, nullptr, code));
 
   isolate->ThrowException(error_obj);
@@ -3131,8 +3171,7 @@ napi_status napi_run_script(napi_env env,
 
   v8::Local<v8::Context> context = env->context();
 
-  auto maybe_script = v8::Script::Compile(context,
-      v8::Local<v8::String>::Cast(v8_script));
+  auto maybe_script = v8::Script::Compile(context, v8_script.As<v8::String>());
   CHECK_MAYBE_EMPTY(env, maybe_script, napi_generic_failure);
 
   auto script_result =

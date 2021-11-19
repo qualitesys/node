@@ -342,6 +342,88 @@
             '<(obj_dir)/<(node_text_start_object_path)'
           ]
         }],
+
+        ['node_fipsinstall=="true"', {
+          'variables': {
+            'openssl-cli': '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)openssl-cli<(EXECUTABLE_SUFFIX)',
+            'provider_name': 'libopenssl-fipsmodule',
+            'opensslconfig': './deps/openssl/openssl/apps/openssl.cnf',
+            'conditions': [
+              ['GENERATOR == "ninja"', {
+	        'fipsmodule_internal': '<(PRODUCT_DIR)/lib/<(provider_name).so',
+                'fipsmodule': '<(PRODUCT_DIR)/obj/lib/openssl-modules/fips.so',
+                'fipsconfig': '<(PRODUCT_DIR)/obj/lib/fipsmodule.cnf',
+                'opensslconfig_internal': '<(PRODUCT_DIR)/obj/lib/openssl.cnf',
+             }, {
+	        'fipsmodule_internal': '<(PRODUCT_DIR)/obj.target/deps/openssl/<(provider_name).so',
+                'fipsmodule': '<(PRODUCT_DIR)/obj.target/deps/openssl/lib/openssl-modules/fips.so',
+                'fipsconfig': '<(PRODUCT_DIR)/obj/deps/openssl/fipsmodule.cnf',
+                'opensslconfig_internal': '<(PRODUCT_DIR)/obj.target/deps/openssl/openssl.cnf',
+             }],
+            ],
+          },
+          'actions': [
+            {
+              'action_name': 'fipsinstall',
+              'process_outputs_as_sources': 1,
+              'inputs': [
+                '<(fipsmodule_internal)',
+              ],
+              'outputs': [
+                '<(fipsconfig)',
+              ],
+              'action': [
+                '<(openssl-cli)', 'fipsinstall',
+                '-provider_name', '<(provider_name)',
+                '-module', '<(fipsmodule_internal)',
+                '-out', '<(fipsconfig)',
+                #'-quiet',
+              ],
+            },
+            {
+              'action_name': 'copy_fips_module',
+              'inputs': [
+                '<(fipsmodule_internal)',
+              ],
+              'outputs': [
+                '<(fipsmodule)',
+              ],
+              'action': [
+                'python', 'tools/copyfile.py',
+                '<(fipsmodule_internal)',
+                '<(fipsmodule)',
+              ],
+            },
+            {
+              'action_name': 'copy_openssl_cnf_and_include_fips_cnf',
+              'inputs': [ '<(opensslconfig)', ],
+              'outputs': [ '<(opensslconfig_internal)', ],
+              'action': [
+                'python', 'tools/enable_fips_include.py',
+                '<(opensslconfig)',
+                '<(opensslconfig_internal)',
+                '<(fipsconfig)',
+              ],
+            },
+          ],
+         }, {
+           'variables': {
+              'opensslconfig_internal': '<(obj_dir)/deps/openssl/openssl.cnf',
+              'opensslconfig': './deps/openssl/openssl/apps/openssl.cnf',
+           },
+           'actions': [
+             {
+               'action_name': 'reset_openssl_cnf',
+               'inputs': [ '<(opensslconfig)', ],
+               'outputs': [ '<(opensslconfig_internal)', ],
+               'action': [
+                 'python', 'tools/copyfile.py',
+                 './deps/openssl/openssl/apps/openssl.cnf',
+                 '<(obj_dir)/deps/openssl/openssl.cnf',
+               ],
+             },
+           ],
+         }],
       ],
     }, # node_core_target_name
     {
@@ -560,6 +642,7 @@
         'src/tracing/trace_event_common.h',
         'src/tracing/traced_value.h',
         'src/timer_wrap.h',
+        'src/timer_wrap-inl.h',
         'src/tty_wrap.h',
         'src/udp_wrap.h',
         'src/util.h',
@@ -789,7 +872,7 @@
             ],
           },
           'conditions': [
-            ['openssl_fips!=""', {
+            ['openssl_is_fips!=""', {
               'variables': { 'mkssldef_flags': ['-DOPENSSL_FIPS'] },
             }],
           ],
@@ -1391,5 +1474,31 @@
         },
       ]
     }], # end aix section
+    # TODO(RaisinTen): Enable this to build on other platforms as well.
+    ['(OS=="mac" or (OS=="linux" and target_arch=="x64")) and \
+      node_use_openssl=="true"', {
+      'targets': [
+        {
+          'target_name': 'test_crypto_engine',
+          'type': 'shared_library',
+          'include_dirs': ['deps/openssl/openssl/include'],
+          'sources': ['test/fixtures/test_crypto_engine.c'],
+          'conditions': [
+            ['OS=="mac"', {
+              'dependencies': ['deps/openssl/openssl.gyp:openssl'],
+              'xcode_settings': {
+                'OTHER_CFLAGS': ['-Wno-deprecated-declarations'],
+              },
+            }],
+            ['OS=="linux" and target_arch=="x64"', {
+              'cflags': [
+                '-Wno-deprecated-declarations',
+                '-fPIC',
+              ],
+            }],
+          ],
+        }, # test_crypto_engine
+      ], # end targets
+    }], # end node_use_openssl section
   ], # end conditions block
 }

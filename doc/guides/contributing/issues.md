@@ -30,7 +30,7 @@ test case we can use to recreate the problem on our own. If we cannot recreate
 the issue, it becomes impossible for us to fix.
 
 In order to rule out the possibility of bugs introduced by userland code, test
-cases should be limited, as much as possible, to using *only* Node.js APIs.
+cases should be limited, as much as possible, to using _only_ Node.js APIs.
 If the bug occurs only when you're using a specific userland module, there is
 a very good chance that either (a) the module has a bug or (b) something in
 Node.js changed that broke the module.

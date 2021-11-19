@@ -174,7 +174,7 @@ class Foo {
 
 ### `snake_case` for C-like structs
 
-For plain C-like structs snake_case can be used.
+For plain C-like structs snake\_case can be used.
 
 ```cpp
 struct foo_bar {
@@ -267,7 +267,8 @@ class ExampleClass {
 
 When working with typed arrays that involve direct data modification
 from C++, use an `AliasedBuffer` when possible. The API abstraction and
-the usage scope of `AliasedBuffer` are documented in [aliased_buffer.h][].
+the usage scope of `AliasedBuffer` are documented in
+[aliased\_buffer.h][aliased_buffer.h].
 
 ```cpp
 // Create an AliasedBuffer.

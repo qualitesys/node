@@ -1027,7 +1027,7 @@ const tsp = require('timers/promises');
   const src = new PassThrough();
   const dst = new PassThrough();
   pipeline(src, dst, common.mustSucceed(() => {
-    assert.strictEqual(dst.destroyed, false);
+    assert.strictEqual(dst.destroyed, true);
   }));
   src.end();
 }
@@ -1405,4 +1405,65 @@ const tsp = require('timers/promises');
     assert.strictEqual(err.name, 'AbortError');
   }));
   ac.abort();
+}
+
+{
+  async function run() {
+    let finished = false;
+    let text = '';
+    const write = new Writable({
+      write(data, enc, cb) {
+        text += data;
+        cb();
+      }
+    });
+    write.on('finish', () => {
+      finished = true;
+    });
+
+    await pipelinep([Readable.from('Hello World!'), write]);
+    assert(finished);
+    assert.strictEqual(text, 'Hello World!');
+  }
+
+  run();
+}
+
+{
+  let finished = false;
+  let text = '';
+  const write = new Writable({
+    write(data, enc, cb) {
+      text += data;
+      cb();
+    }
+  });
+  write.on('finish', () => {
+    finished = true;
+  });
+
+  pipeline([Readable.from('Hello World!'), write], common.mustSucceed(() => {
+    assert(finished);
+    assert.strictEqual(text, 'Hello World!');
+  }));
+}
+
+{
+  const pipelinePromise = promisify(pipeline);
+
+  async function run() {
+    const read = new Readable({
+      read() {}
+    });
+
+    const duplex = new PassThrough();
+
+    read.push(null);
+
+    await pipelinePromise(read, duplex);
+
+    assert.strictEqual(duplex.destroyed, true);
+  }
+
+  run();
 }

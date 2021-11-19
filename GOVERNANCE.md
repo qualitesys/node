@@ -64,7 +64,7 @@ See:
 * Participation in working groups
 * Merging pull requests
 
-The TSC can remove inactive collaborators or provide them with _Emeritus_
+The TSC can remove inactive collaborators or provide them with _emeritus_
 status. Emeriti may request that the TSC restore them to active status.
 
 ## Technical Steering Committee
@@ -87,9 +87,8 @@ Charter need approval by the OpenJS Foundation Cross-Project Council (CPC).
 
 ### TSC meetings
 
-The TSC meets in a voice conference call. Each year, the TSC elects a chair to
-run the meetings. The TSC streams its meetings for public viewing on YouTube or
-a similar service.
+The TSC meets in a video conference call. Each year, the TSC elects a chair to
+run the meetings. The TSC streams its meetings for public viewing on YouTube.
 
 The TSC agenda includes issues that are at an impasse. The intention of the
 agenda is not to review or approve all patches. Collaborators review and approve
@@ -153,8 +152,8 @@ the nomination fails.
 
 There are steps a nominator can take in advance to make a nomination as
 frictionless as possible. To request feedback from other collaborators in
- private, use the [collaborators discussion page][]
- (which only collaborators may view). A nominator may also work with the
+private, use the [collaborators discussion page][]
+(which only collaborators may view). A nominator may also work with the
 nominee to improve their contribution profile.
 
 Collaborators might overlook someone with valuable contributions. In that case,
