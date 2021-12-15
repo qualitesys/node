@@ -1,47 +1,34 @@
 const path = require('path')
 
 const Arborist = require('@npmcli/arborist')
-const log = require('npmlog')
+const log = require('../utils/log-shim.js')
 
 const reifyFinish = require('../utils/reify-finish.js')
 const completion = require('../utils/completion/installed-deep.js')
 
 const ArboristWorkspaceCmd = require('../arborist-cmd.js')
 class Update extends ArboristWorkspaceCmd {
-  /* istanbul ignore next - see test/lib/load-all-commands.js */
-  static get description () {
-    return 'Update packages'
-  }
+  static description = 'Update packages'
+  static name = 'update'
+  static params = [
+    'global',
+    'global-style',
+    'legacy-bundling',
+    'strict-peer-deps',
+    'package-lock',
+    'omit',
+    'ignore-scripts',
+    'audit',
+    'bin-links',
+    'fund',
+    'dry-run',
+    ...super.params,
+  ]
 
-  /* istanbul ignore next - see test/lib/load-all-commands.js */
-  static get name () {
-    return 'update'
-  }
+  static usage = ['[<pkg>...]']
 
-  /* istanbul ignore next - see test/lib/load-all-commands.js */
-  static get params () {
-    return [
-      'global',
-      'global-style',
-      'legacy-bundling',
-      'strict-peer-deps',
-      'package-lock',
-      'omit',
-      'ignore-scripts',
-      'audit',
-      'bin-links',
-      'fund',
-      'dry-run',
-      ...super.params,
-    ]
-  }
-
-  /* istanbul ignore next - see test/lib/load-all-commands.js */
-  static get usage () {
-    return ['[<pkg>...]']
-  }
-
-  /* istanbul ignore next - see test/lib/load-all-commands.js */
+  // TODO
+  /* istanbul ignore next */
   async completion (opts) {
     return completion(this.npm, opts)
   }
@@ -60,7 +47,7 @@ class Update extends ArboristWorkspaceCmd {
 
     const arb = new Arborist({
       ...this.npm.flatOptions,
-      log: this.npm.log,
+      log,
       path: where,
       workspaces: this.workspaceNames,
     })

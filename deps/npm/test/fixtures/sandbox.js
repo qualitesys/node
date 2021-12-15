@@ -4,14 +4,11 @@ const { homedir, tmpdir } = require('os')
 const { dirname, join } = require('path')
 const { promisify } = require('util')
 const mkdirp = require('mkdirp-infer-owner')
-const npmlog = require('npmlog')
 const rimraf = promisify(require('rimraf'))
+const mockLogs = require('./mock-logs')
 
 const chain = new Map()
 const sandboxes = new Map()
-
-// Disable lint errors for assigning to process global
-/* global process:writable */
 
 // keep a reference to the real process
 const _process = process
@@ -24,27 +21,15 @@ createHook({
   before: (asyncId) => {
     // find the nearest parent id that has a sandbox
     let parent = asyncId
-    while (chain.has(parent) && !sandboxes.has(parent))
+    while (chain.has(parent) && !sandboxes.has(parent)) {
       parent = chain.get(parent)
+    }
 
     process = sandboxes.has(parent)
       ? sandboxes.get(parent)
       : _process
   },
 }).enable()
-
-for (const level in npmlog.levels) {
-  npmlog[`_${level}`] = npmlog[level]
-  npmlog[level] = (...args) => {
-    process._logs = process._logs || {}
-    process._logs[level] = process._logs[level] || []
-    process._logs[level].push(args)
-    const _level = npmlog.level
-    npmlog.level = 'silent'
-    npmlog[`_${level}`](...args)
-    npmlog.level = _level
-  }
-}
 
 const _data = Symbol('sandbox.data')
 const _dirs = Symbol('sandbox.dirs')
@@ -56,6 +41,7 @@ const _output = Symbol('sandbox.output')
 const _proxy = Symbol('sandbox.proxy')
 const _get = Symbol('sandbox.proxy.get')
 const _set = Symbol('sandbox.proxy.set')
+const _logs = Symbol('sandbox.logs')
 
 // these config keys can be redacted widely
 const redactedDefaults = [
@@ -91,6 +77,7 @@ class Sandbox extends EventEmitter {
       global: options.global || join(tempDir, 'global'),
       home: options.home || join(tempDir, 'home'),
       project: options.project || join(tempDir, 'project'),
+      cache: options.cache || join(tempDir, 'cache'),
     }
 
     this[_proxy] = new Proxy(_process, {
@@ -110,7 +97,7 @@ class Sandbox extends EventEmitter {
   }
 
   get logs () {
-    return this[_proxy]._logs
+    return this[_logs]
   }
 
   get global () {
@@ -123,6 +110,10 @@ class Sandbox extends EventEmitter {
 
   get project () {
     return this[_dirs].project
+  }
+
+  get cache () {
+    return this[_dirs].cache
   }
 
   get process () {
@@ -201,19 +192,24 @@ class Sandbox extends EventEmitter {
 
   // test.teardown hook
   teardown () {
-    if (this[_parent])
+    if (this[_parent]) {
       sandboxes.delete(this[_parent])
-
+    }
+    if (this[_npm]) {
+      this[_npm].unload()
+    }
     return rimraf(this[_dirs].temp).catch(() => null)
   }
 
   // proxy get handler
   [_get] (target, prop, receiver) {
-    if (this[_data].has(prop))
+    if (this[_data].has(prop)) {
       return this[_data].get(prop)
+    }
 
-    if (this[prop] !== undefined)
+    if (this[prop] !== undefined) {
       return Reflect.get(this, prop, this)
+    }
 
     const actual = Reflect.get(target, prop, receiver)
     if (typeof actual === 'function') {
@@ -271,11 +267,17 @@ class Sandbox extends EventEmitter {
       '--prefix', this.project,
       '--userconfig', join(this.home, '.npmrc'),
       '--globalconfig', join(this.global, 'npmrc'),
+      '--cache', this.cache,
       command,
       ...argv,
     ]
 
-    const Npm = this[_test].mock('../../lib/npm.js', this[_mocks])
+    const mockedLogs = mockLogs(this[_mocks])
+    this[_logs] = mockedLogs.logs
+    const Npm = this[_test].mock('../../lib/npm.js', {
+      ...this[_mocks],
+      ...mockedLogs.logMocks,
+    })
     this[_npm] = new Npm()
     this[_npm].output = (...args) => this[_output].push(args)
     await this[_npm].load()
@@ -317,11 +319,17 @@ class Sandbox extends EventEmitter {
       '--prefix', this.project,
       '--userconfig', join(this.home, '.npmrc'),
       '--globalconfig', join(this.global, 'npmrc'),
+      '--cache', this.cache,
       command,
       ...argv,
     ]
 
-    const Npm = this[_test].mock('../../lib/npm.js', this[_mocks])
+    const mockedLogs = mockLogs(this[_mocks])
+    this[_logs] = mockedLogs.logs
+    const Npm = this[_test].mock('../../lib/npm.js', {
+      ...this[_mocks],
+      ...mockedLogs.logMocks,
+    })
     this[_npm] = new Npm()
     this[_npm].output = (...args) => this[_output].push(args)
     await this[_npm].load()

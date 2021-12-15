@@ -22,6 +22,8 @@ const mocks = {
   ansistyles: { bright: a => a },
   npmlog: {
     gauge: { show () {} },
+  },
+  'proc-log': {
     info () {},
     notice () {},
     warn () {},
@@ -34,10 +36,8 @@ const mocks = {
   'qrcode-terminal': { generate: (url, cb) => cb() },
   'cli-table3': class extends Array {
     toString () {
-      return this
-        .filter(Boolean)
-        .map(i => [...Object.entries(i)]
-          .map(i => i.join(': ')))
+      return this.filter(Boolean)
+        .map(i => [...Object.entries(i)].map(i => i.join(': ')))
         .join('\n')
     }
   },
@@ -78,10 +78,7 @@ const Profile = t.mock('../../../lib/commands/profile.js', mocks)
 const profile = new Profile(npm)
 
 t.test('no args', async t => {
-  await t.rejects(
-    profile.exec([]),
-    profile.usage
-  )
+  await t.rejects(profile.exec([]), profile.usage)
 })
 
 t.test('profile get no args', t => {
@@ -100,10 +97,7 @@ t.test('profile get no args', t => {
   t.test('default output', async t => {
     await profile.exec(['get'])
 
-    t.matchSnapshot(
-      result,
-      'should output table with contents'
-    )
+    t.matchSnapshot(result, 'should output table with contents')
   })
 
   t.test('--json', async t => {
@@ -111,21 +105,14 @@ t.test('profile get no args', t => {
 
     await profile.exec(['get'])
 
-    t.same(
-      JSON.parse(result),
-      userProfile,
-      'should output json profile result'
-    )
+    t.same(JSON.parse(result), userProfile, 'should output json profile result')
   })
 
   t.test('--parseable', async t => {
     config.parseable = true
 
     await profile.exec(['get'])
-    t.matchSnapshot(
-      result,
-      'should output all profile info as parseable result'
-    )
+    t.matchSnapshot(result, 'should output all profile info as parseable result')
   })
 
   t.test('no tfa enabled', async t => {
@@ -145,10 +132,7 @@ t.test('profile get no args', t => {
     const profile = new Profile(npm)
 
     await profile.exec(['get'])
-    t.matchSnapshot(
-      result,
-      'should output expected profile values'
-    )
+    t.matchSnapshot(result, 'should output expected profile values')
   })
 
   t.test('unverified email', async t => {
@@ -169,10 +153,7 @@ t.test('profile get no args', t => {
 
     await profile.exec(['get'])
 
-    t.matchSnapshot(
-      result,
-      'should output table with contents'
-    )
+    t.matchSnapshot(result, 'should output table with contents')
   })
 
   t.test('profile has cidr_whitelist item', async t => {
@@ -193,10 +174,7 @@ t.test('profile get no args', t => {
 
     await profile.exec(['get'])
 
-    t.matchSnapshot(
-      result,
-      'should output table with contents'
-    )
+    t.matchSnapshot(result, 'should output table with contents')
   })
 
   t.end()
@@ -218,11 +196,7 @@ t.test('profile get <key>', t => {
   t.test('default output', async t => {
     await profile.exec(['get', 'name'])
 
-    t.equal(
-      result,
-      'foo',
-      'should output value result'
-    )
+    t.equal(result, 'foo', 'should output value result')
   })
 
   t.test('--json', async t => {
@@ -242,10 +216,7 @@ t.test('profile get <key>', t => {
 
     await profile.exec(['get', 'name'])
 
-    t.matchSnapshot(
-      result,
-      'should output parseable result value'
-    )
+    t.matchSnapshot(result, 'should output parseable result value')
   })
 
   t.end()
@@ -267,10 +238,7 @@ t.test('profile get multiple args', t => {
   t.test('default output', async t => {
     await profile.exec(['get', 'name', 'email', 'github'])
 
-    t.matchSnapshot(
-      result,
-      'should output all keys'
-    )
+    t.matchSnapshot(result, 'should output all keys')
   })
 
   t.test('--json', async t => {
@@ -278,11 +246,7 @@ t.test('profile get multiple args', t => {
 
     await profile.exec(['get', 'name', 'email', 'github'])
 
-    t.same(
-      JSON.parse(result),
-      userProfile,
-      'should output json profile result and ignore args'
-    )
+    t.same(JSON.parse(result), userProfile, 'should output json profile result and ignore args')
   })
 
   t.test('--parseable', async t => {
@@ -290,19 +254,13 @@ t.test('profile get multiple args', t => {
 
     await profile.exec(['get', 'name', 'email', 'github'])
 
-    t.matchSnapshot(
-      result,
-      'should output parseable profile value results'
-    )
+    t.matchSnapshot(result, 'should output parseable profile value results')
   })
 
   t.test('comma separated', async t => {
     await profile.exec(['get', 'name,email,github'])
 
-    t.matchSnapshot(
-      result,
-      'should output all keys'
-    )
+    t.matchSnapshot(result, 'should output all keys')
   })
 
   t.end()
@@ -371,11 +329,7 @@ t.test('profile set <key> <value>', t => {
       const profile = new Profile(npm)
 
       await profile.exec(['set', 'fullname', 'Lorem Ipsum'])
-      t.equal(
-        result,
-        'Set\nfullname\nto\nLorem Ipsum',
-        'should output set key success msg'
-      )
+      t.equal(result, 'Set\nfullname\nto\nLorem Ipsum', 'should output set key success msg')
     })
 
     t.test('--json', async t => {
@@ -413,10 +367,7 @@ t.test('profile set <key> <value>', t => {
 
       await profile.exec(['set', 'fullname', 'Lorem Ipsum'])
 
-      t.matchSnapshot(
-        result,
-        'should output parseable set key success msg'
-      )
+      t.matchSnapshot(result, 'should output parseable set key success msg')
     })
 
     t.end()
@@ -437,11 +388,7 @@ t.test('profile set <key> <value>', t => {
           },
           'should set new value to email'
         )
-        t.match(
-          conf,
-          npm.flatOptions,
-          'should forward flatOptions config'
-        )
+        t.match(conf, npm.flatOptions, 'should forward flatOptions config')
         return {
           ...userProfile,
           ...newUser,
@@ -456,11 +403,7 @@ t.test('profile set <key> <value>', t => {
     const profile = new Profile(npm)
 
     await profile.exec(['set', 'email', 'foo@npmjs.com'])
-    t.equal(
-      result,
-      'Set\nemail\nto\nfoo@npmjs.com',
-      'should output set key success msg'
-    )
+    t.equal(result, 'Set\nemail\nto\nfoo@npmjs.com', 'should output set key success msg')
   })
 
   t.test('change password', async t => {
@@ -481,11 +424,7 @@ t.test('profile set <key> <value>', t => {
           },
           'should set new password'
         )
-        t.match(
-          conf,
-          npm.flatOptions,
-          'should forward flatOptions config'
-        )
+        t.match(conf, npm.flatOptions, 'should forward flatOptions config')
         return {
           ...userProfile,
         }
@@ -494,18 +433,17 @@ t.test('profile set <key> <value>', t => {
 
     const readUserInfo = {
       async password (label) {
-        if (label === 'Current password: ')
+        if (label === 'Current password: ') {
           t.ok('should interactively ask for password confirmation')
-        else if (label === 'New password: ')
+        } else if (label === 'New password: ') {
           t.ok('should interactively ask for new password')
-        else if (label === '       Again:     ')
+        } else if (label === '       Again:     ') {
           t.ok('should interactively ask for new password confirmation')
-        else
+        } else {
           throw new Error('Unexpected label: ' + label)
+        }
 
-        return label === 'Current password: '
-          ? 'currentpassword1234'
-          : 'newpassword1234'
+        return label === 'Current password: ' ? 'currentpassword1234' : 'newpassword1234'
       },
     }
 
@@ -518,11 +456,7 @@ t.test('profile set <key> <value>', t => {
 
     await profile.exec(['set', 'password'])
 
-    t.equal(
-      result,
-      'Set\npassword',
-      'should output set password success msg'
-    )
+    t.equal(result, 'Set\npassword', 'should output set password success msg')
   })
 
   t.test('password confirmation mismatch', async t => {
@@ -548,9 +482,7 @@ t.test('profile set <key> <value>', t => {
           case 'Current password: ':
             return 'currentpassword1234'
           case 'New password: ':
-            return passwordPromptCount < 3
-              ? 'password-that-will-not-be-confirmed'
-              : 'newpassword'
+            return passwordPromptCount < 3 ? 'password-that-will-not-be-confirmed' : 'newpassword'
           case '       Again:     ':
             return 'newpassword'
           default:
@@ -559,23 +491,23 @@ t.test('profile set <key> <value>', t => {
       },
     }
 
-    const npmlog = {
-      gauge: {
-        show () {},
-      },
-      warn (title, msg) {
-        t.equal(title, 'profile', 'should use expected profile')
-        t.equal(
-          msg,
-          'Passwords do not match, please try again.',
-          'should log password mismatch message'
-        )
-      },
-    }
-
     const Profile = t.mock('../../../lib/commands/profile.js', {
       ...mocks,
-      npmlog,
+      npmlog: {
+        gauge: {
+          show () {},
+        },
+      },
+      'proc-log': {
+        warn (title, msg) {
+          t.equal(title, 'profile', 'should use expected profile')
+          t.equal(
+            msg,
+            'Passwords do not match, please try again.',
+            'should log password mismatch message'
+          )
+        },
+      },
       'npm-profile': npmProfile,
       '../../../lib/utils/read-user-info.js': readUserInfo,
     })
@@ -583,11 +515,7 @@ t.test('profile set <key> <value>', t => {
 
     await profile.exec(['set', 'password'])
 
-    t.equal(
-      result,
-      'Set\npassword',
-      'should output set password success msg'
-    )
+    t.equal(result, 'Set\npassword', 'should output set password success msg')
   })
 
   t.end()
@@ -616,7 +544,7 @@ t.test('enable-2fa', t => {
     await t.rejects(
       profile.exec(['enable-2fa', 'auth-only']),
       'Enabling two-factor authentication is an interactive ' +
-      'operation and JSON output mode is not available',
+        'operation and JSON output mode is not available',
       'should throw no support msg'
     )
   })
@@ -627,7 +555,7 @@ t.test('enable-2fa', t => {
     await t.rejects(
       profile.exec(['enable-2fa', 'auth-only']),
       'Enabling two-factor authentication is an interactive ' +
-      'operation and parseable output mode is not available',
+        'operation and parseable output mode is not available',
       'should throw no support msg'
     )
   })
@@ -657,8 +585,8 @@ t.test('enable-2fa', t => {
     await t.rejects(
       profile.exec(['enable-2fa', 'auth-only']),
       'Your registry https://registry.npmjs.org/ does ' +
-      'not seem to support bearer tokens. Bearer tokens ' +
-      'are required for two-factor authentication',
+        'not seem to support bearer tokens. Bearer tokens ' +
+        'are required for two-factor authentication',
       'should throw no support msg'
     )
   })
@@ -684,8 +612,8 @@ t.test('enable-2fa', t => {
     await t.rejects(
       profile.exec(['enable-2fa', 'auth-only']),
       'Your registry https://registry.npmjs.org/ does ' +
-      'not seem to support bearer tokens. Bearer tokens ' +
-      'are required for two-factor authentication',
+        'not seem to support bearer tokens. Bearer tokens ' +
+        'are required for two-factor authentication',
       'should throw no support msg'
     )
   })
@@ -700,8 +628,7 @@ t.test('enable-2fa', t => {
 
     await t.rejects(
       profile.exec(['enable-2fa', 'auth-only']),
-      'You need to be logged in to registry ' +
-      'https://registry.npmjs.org/ in order to enable 2fa'
+      'You need to be logged in to registry ' + 'https://registry.npmjs.org/ in order to enable 2fa'
     )
   })
 
@@ -709,7 +636,7 @@ t.test('enable-2fa', t => {
     t.plan(10)
 
     // mock legacy basic auth style
-    npm.config.getCredentialsByURI = (reg) => {
+    npm.config.getCredentialsByURI = reg => {
       t.equal(reg, flatOptions.registry, 'should use expected registry')
       return { auth: Buffer.from('foo:bar').toString('base64') }
     }
@@ -717,7 +644,7 @@ t.test('enable-2fa', t => {
       t.equal(registry, flatOptions.registry, 'should set expected registry')
       t.equal(token, 'token', 'should set expected token')
     }
-    npm.config.save = (type) => {
+    npm.config.save = type => {
       t.equal(type, 'user', 'should save to user config')
     }
 
@@ -762,7 +689,7 @@ t.test('enable-2fa', t => {
       async otp (label) {
         t.equal(
           label,
-          'Enter one-time password from your authenticator app: ',
+          'Enter one-time password: ',
           'should ask for otp confirmation'
         )
         return '123456'
@@ -839,10 +766,7 @@ t.test('enable-2fa', t => {
           )
           return {
             ...userProfile,
-            tfa: [
-              '123456',
-              '789101',
-            ],
+            tfa: ['123456', '789101'],
           }
         }
 
@@ -863,7 +787,7 @@ t.test('enable-2fa', t => {
     }
 
     const qrcode = {
-      // eslint-disable-next-line standard/no-callback-literal
+      /* eslint-disable-next-line node/no-callback-literal */
       generate: (url, cb) => cb('qrcode'),
     }
 
@@ -877,10 +801,7 @@ t.test('enable-2fa', t => {
 
     await profile.exec(['enable-2fa', 'auth-only'])
 
-    t.matchSnapshot(
-      result,
-      'should output 2fa enablement success msgs'
-    )
+    t.matchSnapshot(result, 'should output 2fa enablement success msgs')
   })
 
   t.test('from token and set otp, retrieves invalid otp', async t => {
@@ -934,7 +855,7 @@ t.test('enable-2fa', t => {
     flatOptions.otp = '123456'
     flatOptions.otp = '123456'
 
-    npm.config.getCredentialsByURI = (reg) => {
+    npm.config.getCredentialsByURI = reg => {
       return { token: 'token' }
     }
 
@@ -976,7 +897,7 @@ t.test('enable-2fa', t => {
   })
 
   t.test('missing tfa from user profile', async t => {
-    npm.config.getCredentialsByURI = (reg) => {
+    npm.config.getCredentialsByURI = reg => {
       return { token: 'token' }
     }
 
@@ -1021,7 +942,7 @@ t.test('enable-2fa', t => {
   })
 
   t.test('defaults to auth-and-writes permission if no mode specified', async t => {
-    npm.config.getCredentialsByURI = (reg) => {
+    npm.config.getCredentialsByURI = reg => {
       return { token: 'token' }
     }
 
@@ -1085,11 +1006,7 @@ t.test('disable-2fa', t => {
     const profile = new Profile(npm)
 
     await profile.exec(['disable-2fa'])
-    t.equal(
-      result,
-      'Two factor authentication not enabled.',
-      'should output already disalbed msg'
-    )
+    t.equal(result, 'Two factor authentication not enabled.', 'should output already disalbed msg')
   })
 
   t.test('requests otp', t => {
@@ -1127,7 +1044,7 @@ t.test('disable-2fa', t => {
       async otp (label) {
         t.equal(
           label,
-          'Enter one-time password from your authenticator app: ',
+          'Enter one-time password: ',
           'should ask for otp confirmation'
         )
         return '1234'
@@ -1143,11 +1060,7 @@ t.test('disable-2fa', t => {
       const profile = new Profile(npm)
 
       await profile.exec(['disable-2fa'])
-      t.equal(
-        result,
-        'Two factor authentication disabled.',
-        'should output already disabled msg'
-      )
+      t.equal(result, 'Two factor authentication disabled.', 'should output already disabled msg')
     })
 
     t.test('--json', async t => {
@@ -1162,11 +1075,7 @@ t.test('disable-2fa', t => {
 
       await profile.exec(['disable-2fa'])
 
-      t.same(
-        JSON.parse(result),
-        { tfa: false },
-        'should output json already disabled msg'
-      )
+      t.same(JSON.parse(result), { tfa: false }, 'should output json already disabled msg')
     })
 
     t.test('--parseable', async t => {
@@ -1181,11 +1090,7 @@ t.test('disable-2fa', t => {
 
       await profile.exec(['disable-2fa'])
 
-      t.equal(
-        result,
-        'tfa\tfalse',
-        'should output parseable already disabled msg'
-      )
+      t.equal(result, 'tfa\tfalse', 'should output parseable already disabled msg')
     })
 
     t.end()
@@ -1240,11 +1145,7 @@ t.test('disable-2fa', t => {
 
     await profile.exec(['disable-2fa'])
 
-    t.equal(
-      result,
-      'Two factor authentication disabled.',
-      'should output already disalbed msg'
-    )
+    t.equal(result, 'Two factor authentication disabled.', 'should output already disalbed msg')
   })
 
   t.end()
@@ -1260,11 +1161,7 @@ t.test('unknown subcommand', async t => {
 
 t.test('completion', t => {
   const testComp = async ({ t, argv, expect, title }) => {
-    t.resolveMatch(
-      profile.completion({ conf: { argv: { remain: argv } } }),
-      expect,
-      title
-    )
+    t.resolveMatch(profile.completion({ conf: { argv: { remain: argv } } }), expect, title)
   }
 
   t.test('npm profile autocomplete', async t => {
@@ -1306,7 +1203,8 @@ t.test('completion', t => {
   t.test('npm profile unknown subcommand autocomplete', async t => {
     t.rejects(
       profile.completion({ conf: { argv: { remain: ['npm', 'profile', 'asdf'] } } }),
-      { message: 'asdf not recognized' }, 'should throw unknown cmd error'
+      { message: 'asdf not recognized' },
+      'should throw unknown cmd error'
     )
     t.end()
   })

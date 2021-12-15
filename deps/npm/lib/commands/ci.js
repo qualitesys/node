@@ -5,8 +5,7 @@ const reifyFinish = require('../utils/reify-finish.js')
 const runScript = require('@npmcli/run-script')
 const fs = require('fs')
 const readdir = util.promisify(fs.readdir)
-
-const log = require('npmlog')
+const log = require('../utils/log-shim.js')
 
 const removeNodeModules = async where => {
   const rimrafOpts = { glob: false }
@@ -20,24 +19,13 @@ const removeNodeModules = async where => {
 const ArboristWorkspaceCmd = require('../arborist-cmd.js')
 
 class CI extends ArboristWorkspaceCmd {
-  /* istanbul ignore next - see test/lib/load-all-commands.js */
-  static get description () {
-    return 'Install a project with a clean slate'
-  }
-
-  /* istanbul ignore next - see test/lib/load-all-commands.js */
-  static get name () {
-    return 'ci'
-  }
-
-  /* istanbul ignore next - see test/lib/load-all-commands.js */
-  static get params () {
-    return [
-      'audit',
-      'ignore-scripts',
-      'script-shell',
-    ]
-  }
+  static description = 'Install a project with a clean slate'
+  static name = 'ci'
+  static params = [
+    'audit',
+    'ignore-scripts',
+    'script-shell',
+  ]
 
   async exec () {
     if (this.npm.config.get('global')) {
@@ -50,7 +38,7 @@ class CI extends ArboristWorkspaceCmd {
     const opts = {
       ...this.npm.flatOptions,
       path: where,
-      log: this.npm.log,
+      log,
       save: false, // npm ci should never modify the lockfile or package.json
       workspaces: this.workspaceNames,
     }

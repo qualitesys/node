@@ -1,36 +1,26 @@
 // dedupe duplicated packages, or find them in the tree
 const Arborist = require('@npmcli/arborist')
 const reifyFinish = require('../utils/reify-finish.js')
+const log = require('../utils/log-shim.js')
 
 const ArboristWorkspaceCmd = require('../arborist-cmd.js')
 
 class Dedupe extends ArboristWorkspaceCmd {
-  /* istanbul ignore next - see test/lib/load-all-commands.js */
-  static get description () {
-    return 'Reduce duplication in the package tree'
-  }
-
-  /* istanbul ignore next - see test/lib/load-all-commands.js */
-  static get name () {
-    return 'dedupe'
-  }
-
-  /* istanbul ignore next - see test/lib/load-all-commands.js */
-  static get params () {
-    return [
-      'global-style',
-      'legacy-bundling',
-      'strict-peer-deps',
-      'package-lock',
-      'omit',
-      'ignore-scripts',
-      'audit',
-      'bin-links',
-      'fund',
-      'dry-run',
-      ...super.params,
-    ]
-  }
+  static description = 'Reduce duplication in the package tree'
+  static name = 'dedupe'
+  static params = [
+    'global-style',
+    'legacy-bundling',
+    'strict-peer-deps',
+    'package-lock',
+    'omit',
+    'ignore-scripts',
+    'audit',
+    'bin-links',
+    'fund',
+    'dry-run',
+    ...super.params,
+  ]
 
   async exec (args) {
     if (this.npm.config.get('global')) {
@@ -43,7 +33,7 @@ class Dedupe extends ArboristWorkspaceCmd {
     const where = this.npm.prefix
     const opts = {
       ...this.npm.flatOptions,
-      log: this.npm.log,
+      log,
       path: where,
       dryRun,
       workspaces: this.workspaceNames,

@@ -16,8 +16,16 @@ let deletedConfig = {}
 let registryOutput = ''
 let setConfig = {}
 const authDummy = (npm, options) => {
-  if (!options.fromFlatOptions)
+  if (!options.fromFlatOptions) {
     throw new Error('did not pass full flatOptions to auth function')
+  }
+
+  if (!options.log) {
+    // A quick to test to make sure a log gets passed to auth
+    // XXX: should be refactored with change to real mock npm
+    // https://github.com/npm/statusboard/issues/411
+    throw new Error('pass log to auth')
+  }
 
   return Promise.resolve({
     message: 'success',
@@ -40,13 +48,15 @@ const npm = {
   config: {
     delete: deleteMock,
     get (key, where) {
-      if (!where || where === 'user')
+      if (!where || where === 'user') {
         return _flatOptions[key]
+      }
     },
     getCredentialsByURI,
     async save () {
-      if (failSave)
+      if (failSave) {
         throw new Error('error saving user config')
+      }
     },
     set (key, value, where) {
       setConfig = {
@@ -68,6 +78,8 @@ const AddUser = t.mock('../../../lib/commands/adduser.js', {
   npmlog: {
     clearProgress: () => null,
     disableProgress: () => null,
+  },
+  'proc-log': {
     notice: (_, msg) => {
       registryOutput = msg
     },

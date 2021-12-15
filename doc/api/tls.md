@@ -1010,7 +1010,7 @@ const keyingMaterial = tlsSocket.exportKeyingMaterial(
   128,
   'client finished');
 
-/**
+/*
  Example return value of keyingMaterial:
  <Buffer 76 26 af 99 c5 56 8e 42 09 91 ef 9f 93 cb ad 6c 7b 65 f8 53 f1 d8 d9
     12 5a 33 b8 b5 25 df 7b 37 9f e0 e2 4f b8 67 83 a3 2f cd 5d 41 42 4c 91
@@ -1133,7 +1133,7 @@ certificate.
 
 <!-- YAML
 changes:
-  - version: REPLACEME
+  - version: v17.2.0
     pr-url: https://github.com/nodejs/node/pull/39809
     description: Add fingerprint512.
   - version: v11.4.0
@@ -1472,8 +1472,8 @@ Verifies the certificate `cert` is issued to `hostname`.
 Returns {Error} object, populating it with `reason`, `host`, and `cert` on
 failure. On success, returns {undefined}.
 
-This function can be overwritten by providing alternative function as part of
-the `options.checkServerIdentity` option passed to `tls.connect()`. The
+This function can be overwritten by providing an alternative function as the
+`options.checkServerIdentity` option that is passed to `tls.connect()`. The
 overwriting function can call `tls.checkServerIdentity()` of course, to augment
 the checks done with additional verification.
 

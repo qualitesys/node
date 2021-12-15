@@ -1,6 +1,7 @@
 const t = require('tap')
 
-t.cleanSnapshot = str => str.replace(/published .*? ago/g, 'published {TIME} ago')
+t.cleanSnapshot = str => str
+  .replace(/(published ).*?( ago)/g, '$1{TIME}$2')
 
 // run the same as tap does when running directly with node
 process.stdout.columns = undefined
@@ -17,15 +18,17 @@ const cleanLogs = () => {
   console.log = fn
 }
 
-// 25 hours ago
-const yesterday = new Date(Date.now() - 1000 * 60 * 60 * 25)
+// 3 days. its never yesterday and never a week ago
+const yesterday = new Date(Date.now() - 1000 * 60 * 60 * 24 * 3)
 
 const packument = (nv, opts) => {
-  if (!opts.fullMetadata)
+  if (!opts.fullMetadata) {
     throw new Error('must fetch fullMetadata')
+  }
 
-  if (!opts.preferOnline)
+  if (!opts.preferOnline) {
     throw new Error('must fetch with preferOnline')
+  }
 
   const mocks = {
     red: {
@@ -192,8 +195,9 @@ const packument = (nv, opts) => {
           license: {},
           dependencies: (() => {
             const deps = {}
-            for (let i = 0; i < 25; i++)
+            for (let i = 0; i < 25; i++) {
               deps[i] = '1.0.0'
+            }
 
             return deps
           })(),
@@ -255,8 +259,9 @@ const packument = (nv, opts) => {
       },
     },
   }
-  if (nv.type === 'git')
+  if (nv.type === 'git') {
     return mocks[nv.hosted.project]
+  }
   return mocks[nv.name]
 }
 
@@ -528,7 +533,7 @@ t.test('throws when unpublished', async t => {
   const view = new View(npm)
   await t.rejects(
     view.exec(['red']),
-    { code: 'E404'}
+    { code: 'E404' }
   )
 })
 
@@ -560,6 +565,12 @@ t.test('workspaces', async t => {
     pacote: {
       packument,
     },
+    'proc-log': {
+      warn: (msg) => {
+        warnMsg = msg
+      },
+      silly: () => {},
+    },
   })
   const config = {
     unicode: false,
@@ -567,11 +578,6 @@ t.test('workspaces', async t => {
   }
   let warnMsg
   const npm = mockNpm({
-    log: {
-      warn: (msg) => {
-        warnMsg = msg
-      },
-    },
     config,
     localPrefix: testDir,
   })
@@ -654,7 +660,7 @@ t.test('no registry completion', async t => {
     },
   })
   const view = new View(npm)
-  const res = await view.completion({conf: { argv: { remain: ['npm', 'view'] } } })
+  const res = await view.completion({ conf: { argv: { remain: ['npm', 'view'] } } })
   t.notOk(res, 'there is no package completion')
   t.end()
 })

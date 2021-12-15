@@ -52,13 +52,15 @@ t.test('should use Arborist and run-script', async t => {
   // when the test is done, we assert that all timers ended
   const timers = {}
   const onTime = msg => {
-    if (timers[msg])
+    if (timers[msg]) {
       throw new Error(`saw duplicate timer: ${msg}`)
+    }
     timers[msg] = true
   }
   const onTimeEnd = msg => {
-    if (!timers[msg])
+    if (!timers[msg]) {
       throw new Error(`ended timer that was not started: ${msg}`)
+    }
     timers[msg] = false
   }
   process.on('time', onTime)
@@ -118,8 +120,9 @@ t.test('should use Arborist and run-script', async t => {
   const ci = new CI(npm)
 
   await ci.exec(null)
-  for (const [msg, result] of Object.entries(timers))
+  for (const [msg, result] of Object.entries(timers)) {
     t.notOk(result, `properly resolved ${msg} timer`)
+  }
   t.match(timers, { 'npm-ci:rm': false }, 'saw the rimraf timer')
   t.equal(actualRimrafs, expectRimrafs, 'removed the right number of things')
   t.strictSame(scripts, [], 'called all scripts')
@@ -156,7 +159,7 @@ t.test('should throw if package-lock.json or npm-shrinkwrap missing', async t =>
   const CI = t.mock('../../../lib/commands/ci.js', {
     '@npmcli/run-script': opts => {},
     '../../../lib/utils/reify-finish.js': async () => {},
-    npmlog: {
+    'proc-log': {
       verbose: () => {
         t.ok(true, 'log fn called')
       },

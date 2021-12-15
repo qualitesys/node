@@ -1182,7 +1182,7 @@ This API throws a JavaScript `RangeError` with the text provided.
 #### `node_api_throw_syntax_error`
 
 <!-- YAML
-added: REPLACEME
+added: v17.2.0
 -->
 
 ````c
@@ -1298,7 +1298,7 @@ This API returns a JavaScript `RangeError` with the text provided.
 #### `node_api_create_syntax_error`
 
 <!-- YAML
-added: REPLACEME
+added: v17.2.0
 -->
 
 ```c
@@ -2216,6 +2216,7 @@ napi_status napi_create_arraybuffer(napi_env env,
 * `[in] env`: The environment that the API is invoked under.
 * `[in] length`: The length in bytes of the array buffer to create.
 * `[out] data`: Pointer to the underlying byte buffer of the `ArrayBuffer`.
+  `data` can optionally be ignored by passing `NULL`.
 * `[out] result`: A `napi_value` representing a JavaScript `ArrayBuffer`.
 
 Returns `napi_ok` if the API succeeded.
@@ -2250,6 +2251,7 @@ napi_status napi_create_buffer(napi_env env,
 * `[in] env`: The environment that the API is invoked under.
 * `[in] size`: Size in bytes of the underlying buffer.
 * `[out] data`: Raw pointer to the underlying buffer.
+  `data` can optionally be ignored by passing `NULL`.
 * `[out] result`: A `napi_value` representing a `node::Buffer`.
 
 Returns `napi_ok` if the API succeeded.
@@ -2277,6 +2279,7 @@ napi_status napi_create_buffer_copy(napi_env env,
   of the new buffer).
 * `[in] data`: Raw pointer to the underlying buffer to copy from.
 * `[out] result_data`: Pointer to the new `Buffer`'s underlying data buffer.
+  `result_data` can optionally be ignored by passing `NULL`.
 * `[out] result`: A `napi_value` representing a `node::Buffer`.
 
 Returns `napi_ok` if the API succeeded.
@@ -4588,8 +4591,8 @@ napi_status napi_create_function(napi_env env,
 ```
 
 * `[in] env`: The environment that the API is invoked under.
-* `[in] utf8Name`: The name of the function encoded as UTF8. This is visible
-  within JavaScript as the new function object's `name` property.
+* `[in] utf8Name`: Optional name of the function encoded as UTF8. This is
+  visible within JavaScript as the new function object's `name` property.
 * `[in] length`: The length of the `utf8name` in bytes, or `NAPI_AUTO_LENGTH` if
   it is null-terminated.
 * `[in] cb`: The native function which should be called when this function
@@ -4672,14 +4675,18 @@ napi_status napi_get_cb_info(napi_env env,
 * `[in] env`: The environment that the API is invoked under.
 * `[in] cbinfo`: The callback info passed into the callback function.
 * `[in-out] argc`: Specifies the length of the provided `argv` array and
-  receives the actual count of arguments.
+  receives the actual count of arguments. `argc` can
+  optionally be ignored by passing `NULL`.
 * `[out] argv`: Buffer to which the `napi_value` representing the arguments are
   copied. If there are more arguments than the provided count, only the
   requested number of arguments are copied. If there are fewer arguments
   provided than claimed, the rest of `argv` is filled with `napi_value` values
-  that represent `undefined`.
-* `[out] this`: Receives the JavaScript `this` argument for the call.
-* `[out] data`: Receives the data pointer for the callback.
+  that represent `undefined`. `argv` can optionally be ignored by
+  passing `NULL`.
+* `[out] this`: Receives the JavaScript `this` argument for the call. `this`
+  can optionally be ignored by passing `NULL`.
+* `[out] data`: Receives the data pointer for the callback. `data` can
+  optionally be ignored by passing `NULL`.
 
 Returns `napi_ok` if the API succeeded.
 
@@ -4728,7 +4735,8 @@ napi_status napi_new_instance(napi_env env,
   as a constructor.
 * `[in] argc`: The count of elements in the `argv` array.
 * `[in] argv`: Array of JavaScript values as `napi_value` representing the
-  arguments to the constructor.
+  arguments to the constructor. If `argc` is zero this parameter may be
+  omitted by passing in `NULL`.
 * `[out] result`: `napi_value` representing the JavaScript object returned,
   which in this case is the constructed object.
 
@@ -5505,7 +5513,8 @@ NAPI_EXTERN napi_status napi_make_callback(napi_env env,
 * `[in] func`: `napi_value` representing the JavaScript function to be invoked.
 * `[in] argc`: The count of elements in the `argv` array.
 * `[in] argv`: Array of JavaScript values as `napi_value` representing the
-  arguments to the function.
+  arguments to the function. If `argc` is zero this parameter may be
+  omitted by passing in `NULL`.
 * `[out] result`: `napi_value` representing the JavaScript object returned.
 
 Returns `napi_ok` if the API succeeded.
